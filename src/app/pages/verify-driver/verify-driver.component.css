@@ -1,288 +1,371 @@
-/* src/app/pages/verify-driver/verify-driver.component.css */
-
 /* --- General Container --- */
 .verify-driver-container {
-    min-height: 100vh;
-    background: linear-gradient(135deg,  #13096b 60%,#c6cef1 );
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-attachment: fixed;
-    background-position: center;
-    position: relative;
-    padding: 2rem 1rem;
-  }
-  .hero-content {
-    animation: fadeInUp 0.8s ease-out;
-  }
-  /* --- Hero Section --- */
-  .hero-section {
-    padding: 3rem 0;
-    color: white;
-    text-align: center;
-  }
-  .icon-wrapper {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-  }
-  .hero-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-  }
-  .hero-subtitle {
-    font-size: 1.2rem;
-    opacity: 0.9;
-    max-width: 600px;
-    margin: 0 auto;
-  }
-  
-  /* --- Main Content --- */
-  .main-content {
-    padding-top: 2rem;
-    animation: fadeInUp 0.8s ease-out;
-  }
-  
-  /* --- Steps Progress Bar --- */
-  .steps-container {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  }
-  .steps-wrapper {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-  }
-  .step {
-    text-align: center;
-    width: 100px;
-    position: relative;
-  }
-  .step-icon {
-    width: 50px;
-    height: 50px;
-    margin: 0 auto 0.5rem;
-    border-radius: 50%;
-    background: #e9ecef;
-    color: #6c757d;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    transition: all 0.4s ease;
-    border: 3px solid #e9ecef;
-  }
-  .step-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #6c757d;
-    transition: color 0.4s ease;
-  }
-  .step-line {
-    flex: 1;
-    height: 4px;
-    background: #e9ecef;
-    margin: 23px 0;
-    transition: background-color 0.4s ease;
-  }
-  .step-description{
-    color: #a4a8ca;
-  }
-  /* Active & Completed States */
-  .step.active .step-icon {
-    border-color: #8e2de2;
-    background-color: #fff;
-    color: #8e2de2;
-  }
-  .step.active .step-title {
-    color: #8e2de2;
-  }
-  .step.completed .step-icon {
-    border-color: #28a745;
-    background-color: #28a745;
-    color: white;
-  }
-  .step.completed .step-title {
-    color: #28a745;
-  }
-  .step-line.completed {
-    background-color: #28a745;
-  }
-  
-  /* --- Form Card --- */
-  .form-card {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-  }
-  .card-header {
-    background: #f8f9fa;
-    padding: 1.5rem 2rem;
-    border-bottom: 1px solid #dee2e6;
-  }
-  .step-title-main {
-    font-size: 1.5rem;
-    color: #343a40;
-  }
-  .card-body {
-    padding: 2.5rem;
-    border: #c4bff3 solid 1px;
-  }
-  .step-content {
-    animation: fadeIn 0.5s ease-in-out;
-  }
-  
-  /* --- Form Elements --- */
-  .form-label {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-  }
-  .form-control, .form-select {
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-  }
-  .form-control:focus, .form-select:focus {
-    border-color: #8e2de2;
-    box-shadow: 0 0 0 0.25rem rgba(142, 45, 226, 0.25);
-  }
-  
-  /* --- Image Previews --- */
-  .image-preview-single {
-    margin-top: 1rem;
-    text-align: center;
-  }
-  .image-preview-single img {
-    max-width: 200px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    padding: 4px;
-  }
-  .image-preview-multiple {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-  .preview-item {
-    width: 100px;
-    height: 100px;
-  }
-  .preview-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  }
-  
-  /* --- Review Section --- */
-  .review-section {
-    background-color: #f8f9fa;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-    border-left: 4px solid #8e2de2;
-  }
-  .review-section h6 {
-    font-weight: 700;
-    color: #4a00e0;
-    margin-bottom: 1rem;
-  }
-  .review-image {
-    max-width: 200px;
-    border-radius: 8px;
-    margin-top: 0.5rem;
-  }
-  .review-image-small {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 8px;
-  }
-  
-  /* --- Footer & Buttons --- */
-  .card-footer {
-    background: #f8f9fa;
-    padding: 1.5rem 2rem;
-    border-top: 1px solid #dee2e6;
-  }
-  .btn {
-    border-radius: 8px;
-    padding: 0.6rem 1.5rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-  }
-  .btn-primary {
-    background: #8e2de2;
-    border-color: #8e2de2;
-  }
-  .btn-primary:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(142, 45, 226, 0.3);
-  }
-  .btn:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-  }
-  
-  /* --- Animations --- */
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
-  /* ======================================================== */
-  /* === الجزء المضاف: تصميم رسائل التحقق والحقول الخاطئة === */
-  /* ======================================================== */
-  
-  /* --- 1. تصميم الحقول غير الصالحة --- */
-  .form-control.is-invalid, 
-  .form-select.is-invalid {
-    border-color: #dc3545; /* لون أحمر للحدود */
-  }
-  
-  .form-control.is-invalid:focus, 
-  .form-select.is-invalid:focus {
-    border-color: #dc3545;
-    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25); /* ظل أحمر عند التركيز */
-  }
-  
-  /* --- 2. تصميم رسائل الخطأ --- */
-  .field-error-message {
-    width: 100%;
-    margin-top: 0.25rem;
-    font-size: 0.875em;
-    color: #dc3545; /* لون أحمر للرسالة */
-    font-weight: 500;
-    animation: fadeIn 0.3s ease-in-out;
-  }
+  min-height: 100vh;
+  background-color: #f0f2f5; /* Using a light grey background for a cleaner look */
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  position: relative;
+  /* SOLUTION 1: Add top padding to create space from navbar */
+  padding: 4rem 1rem 2rem 1rem; /* Increased top padding from 2rem to 4rem */
+}
 
-/* Success Popup Styles */
-.modal-backdrop {
-  position: fixed;
-  top: 0; left: 0; width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.4);
+/* Alternative Solutions (uncomment to use instead of Solution 1) */
+/*
+.verify-driver-container {
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  position: relative;
+  padding: 2rem 1rem; // Keep original padding
+}
+*/
+
+/* --- Main Content --- */
+.main-content {
+  /* SOLUTION 2: Increase top padding on main content */
+  padding-top: 4rem; /* Increased from 2rem to 4rem */
+  animation: fadeInUp 0.8s ease-out;
+}
+
+/* Alternative for Solution 2 (if using original container padding) */
+/*
+.main-content {
+  padding-top: 2rem; // Keep original
+  animation: fadeInUp 0.8s ease-out;
+}
+*/
+
+/* SOLUTION 3: Create a spacer class for more control */
+.navbar-spacer {
+  height: 2rem; /* Adjust this value as needed */
+  width: 100%;
+}
+
+/* ======================================================== */
+/*          LAYOUT & HERO SECTION STYLES                    */
+/* ======================================================== */
+
+/* --- Steps Container (Now holds the Hero Section) --- */
+.steps-container {
+  background: white;
+  border-radius: 12px;
+  padding: 2.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  /* SOLUTION 4: Add top margin specifically to the steps container */
+  /* margin-top: 2rem; */ /* Uncomment this if using alternative solutions */
+}
+
+/* --- Hero Section (Styles adjusted for white background) --- */
+.hero-section {
+  padding: 0 0 2.5rem 0;
+  color: #333;
+  text-align: center;
+}
+
+.icon-wrapper {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #f0f2f5; /* This makes the icon yellow */
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #343a40;
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  color: #6c757d;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ======================================================== */
+/*          MULTI-STEP PROGRESS BAR STYLES                  */
+/* ======================================================== */
+
+.steps-wrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.step {
+  text-align: center;
+  width: 100px;
+  position: relative;
+}
+.step-icon {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 0.5rem;
+  border-radius: 50%;
+  background: #e9ecef;
+  color: #6c757d;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  font-size: 1.5rem;
+  transition: all 0.4s ease;
+  border: 3px solid #e9ecef;
 }
-.modal-popup {
-  background: #fff;
-  padding: 2rem 1.5rem;
-  border-radius: 12px;
-  text-align: center;
-  max-width: 90vw;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+.step-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6c757d;
+  transition: color 0.4s ease;
 }
-.modal-popup h2 {
+.step-line {
+  flex: 1;
+  height: 4px;
+  background: #e9ecef;
+  margin: 23px 0;
+  transition: background-color 0.4s ease;
+}
+.step-description{
+  color: #a4a8ca;
+}
+/* Active & Completed States */
+.step.active .step-icon {
+  border-color: #8e2de2;
+  background-color: #fff;
+  color: #8e2de2;
+}
+.step.active .step-title {
+  color: #8e2de2;
+}
+.step.completed .step-icon {
+  border-color: #28a745;
+  background-color: #28a745;
+  color: white;
+}
+.step.completed .step-title {
+  color: #28a745;
+}
+.step-line.completed {
+  background-color: #28a745;
+}
+
+/* ======================================================== */
+/*          FORM CARD & ELEMENTS STYLES                     */
+/* ======================================================== */
+
+.form-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+.card-header {
+  background: #f8f9fa;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #dee2e6;
+}
+.step-title-main {
+  font-size: 1.5rem;
+  color: #343a40;
+}
+.card-body {
+  padding: 2.5rem;
+}
+.step-content {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* --- Form Elements --- */
+.form-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.form-control, .form-select {
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+.form-control:focus, .form-select:focus {
+  border-color: #8e2de2;
+  box-shadow: 0 0 0 0.25rem rgba(142, 45, 226, 0.25);
+}
+
+/* ======================================================== */
+/*          IMAGE PREVIEW & REMOVE BUTTON STYLES            */
+/* ======================================================== */
+
+.image-preview-multiple {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.preview-item {
+  position: relative; /* Crucial for positioning the button */
+  width: 100px;
+  height: 100px;
+}
+
+.preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* ✅ Style for the remove button */
+.remove-image-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 26px;
+  height: 26px;
+  background-color: #dc3545; /* Red background */
+  color: white;
+  border: 2px solid white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  transition: all 0.2s ease;
+  padding: 0;
+  z-index: 10; /* Ensure it's on top */
+}
+
+.remove-image-btn:hover {
+  transform: scale(1.1);
+  background-color: #c82333; /* Darker red on hover */
+}
+
+.remove-image-btn fa-icon {
+  font-size: 0.8rem;
+}
+
+/* ======================================================== */
+/*          REVIEW, FOOTER & BUTTONS                        */
+/* ======================================================== */
+
+.review-section {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #8e2de2;
+}
+.review-section h6 {
+  font-weight: 700;
   color: #4a00e0;
   margin-bottom: 1rem;
 }
+.review-image-small {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.card-footer {
+  background: #f8f9fa;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #dee2e6;
+}
+.btn {
+  border-radius: 8px;
+  padding: 0.6rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+.btn-primary {
+  background: #8e2de2;
+  border-color: #8e2de2;
+}
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(142, 45, 226, 0.3);
+}
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ======================================================== */
+/*          VALIDATION, POPUPS & ANIMATIONS                 */
+/* ======================================================== */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.form-control.is-invalid, 
+.form-select.is-invalid {
+  border-color: #dc3545;
+}
+.form-control.is-invalid:focus, 
+.form-select.is-invalid:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+.field-error-message {
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.875em;
+  color: #dc3545;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-backdrop {
+position: fixed;
+top: 0; left: 0; width: 100vw; height: 100vh;
+background: rgba(0,0,0,0.4);
+display: flex;
+align-items: center;
+justify-content: center;
+z-index: 9999;
+}
+.modal-popup {
+background: #fff;
+padding: 2rem 1.5rem;
+border-radius: 12px;
+text-align: center;
+max-width: 90vw;
+box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+.modal-popup h2 {
+color: #4a00e0;
+margin-bottom: 1rem;
+}
 .modal-popup p {
-  margin-bottom: 2rem;
-  font-size: 1.1rem;
+margin-bottom: 2rem;
+font-size: 1.1rem;
+}
+
+/* ======================================================== */
+/*          RESPONSIVE DESIGN FOR MOBILE                    */
+/* ======================================================== */
+
+@media (max-width: 768px) {
+  .verify-driver-container {
+    padding: 3rem 1rem 2rem 1rem; /* Less spacing on mobile */
+  }
+  
+  .main-content {
+    padding-top: 3rem; /* Less spacing on mobile */
+  }
+  
+  .hero-title {
+    font-size: 2rem; /* Smaller title on mobile */
+  }
+  
+  .hero-subtitle {
+    font-size: 1rem; /* Smaller subtitle on mobile */
+  }
 }

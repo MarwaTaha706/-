@@ -10,11 +10,12 @@ import { AuthService } from '../../services/auth.service';
 import {
   faShieldAlt, faCheckCircle, faExclamationTriangle, faIdCard,
   faUserCheck, faCameraRetro, faCar, faClipboardCheck, faEdit,
-  faArrowRight, faArrowLeft, faInfoCircle, faTimes, faCarSide // New icon for car license
+  faArrowRight, faArrowLeft, faInfoCircle, faTimes, faCarSide
 } from '@fortawesome/free-solid-svg-icons';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 
-function arrayRequired(control: AbstractControl) {
+// Custom validator to ensure a file array is not empty
+function arrayRequired(control: AbstractControl): { [key: string]: any } | null {
   const value = control.value;
   return Array.isArray(value) && value.length > 0 ? null : { required: true };
 }
@@ -42,7 +43,7 @@ export class VerifyDriverComponent implements OnInit {
 
   icons = {
     main: faShieldAlt, success: faCheckCircle, error: faExclamationTriangle,
-    license: faIdCard, carLicense: faCarSide, // Added icon for car license
+    license: faIdCard, carLicense: faCarSide,
     identity: faUserCheck, camera: faCameraRetro, vehicle: faCar,
     review: faClipboardCheck, edit: faEdit, prev: faArrowRight,
     next: faArrowLeft, info: faInfoCircle, close: faTimes
@@ -50,14 +51,23 @@ export class VerifyDriverComponent implements OnInit {
 
   verificationForm!: FormGroup;
   currentStep = 1;
-  totalSteps = 6; // ✅ UPDATED: Total steps is now 6
+  totalSteps = 6;
   isSubmitting = false;
   toast: { message: string, type: 'success' | 'error' } | null = null;
   showSuccessPopup = false;
 
+  // Holds the safe URLs for image previews
   previews: { [key: string]: SafeUrl[] } = {
     licenseFile: [],
-    carLicenseFile: [], // ✅ ADDED: Preview array for car license images
+    carLicenseFile: [],
+    driverIdFile: [],
+    vehicleImages: []
+  };
+
+  // Manually tracks the actual File objects for each control
+  private selectedFiles: { [key: string]: File[] } = {
+    licenseFile: [],
+    carLicenseFile: [],
     driverIdFile: [],
     vehicleImages: []
   };
@@ -66,10 +76,10 @@ export class VerifyDriverComponent implements OnInit {
 
   ngOnInit(): void {
     this.verificationForm = this.fb.group({
-      licenseFile: [null, [arrayRequired]],
-      carLicenseFile: [null, [arrayRequired]], // ✅ ADDED: Form control for car license images
-      driverIdFile: [null, [arrayRequired]],
-      vehicleImages: [null, [arrayRequired]],
+      licenseFile: [[], [arrayRequired]],
+      carLicenseFile: [[], [arrayRequired]],
+      driverIdFile: [[], [arrayRequired]],
+      vehicleImages: [[], [arrayRequired]],
       vehicleMake: ['', [Validators.required]],
       vehicleModel: ['', [Validators.required]],
       vehicleColor: ['', [Validators.required]],
@@ -95,7 +105,6 @@ export class VerifyDriverComponent implements OnInit {
   }
 
   isStepValid(): boolean {
-    // ✅ UPDATED: Validation logic now includes the new step
     switch (this.currentStep) {
       case 1: return this.f['licenseFile'].valid;
       case 2: return this.f['carLicenseFile'].valid;
@@ -107,19 +116,39 @@ export class VerifyDriverComponent implements OnInit {
   }
 
   getStepTitle(): string {
-    // ✅ UPDATED: Titles array now includes the new step
     const titles = ['رخصة القيادة', 'رخصة السيارة', 'هوية السائق', 'صور المركبة', 'بيانات المركبة', 'المراجعة النهائية'];
     return titles[this.currentStep - 1];
   }
 
-  onFileSelected(event: Event, controlName: 'licenseFile' | 'carLicenseFile' | 'driverIdFile' | 'vehicleImages'): void {
+  // This method now adds newly selected files to our tracking array
+  onFileSelected(event: Event, controlName: string): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      const files = Array.from(input.files);
-      this.verificationForm.patchValue({ [controlName]: files });
-      this.previews[controlName] = files.map(file => this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(file)));
-      this.verificationForm.get(controlName)?.updateValueAndValidity();
+      const newFiles = Array.from(input.files);
+      this.selectedFiles[controlName].push(...newFiles);
+      this.updateFormControl(controlName);
+      // Clear the input value to allow selecting the same file again after removing it
+      input.value = '';
     }
+  }
+
+  // This new method removes a specific image by its index
+  removeImage(controlName: string, index: number): void {
+    // Remove the file from our manual tracking array
+    this.selectedFiles[controlName].splice(index, 1);
+    // Update the form and previews
+    this.updateFormControl(controlName);
+  }
+
+  // A helper function to keep the form value and previews in sync
+  private updateFormControl(controlName: string): void {
+    const files = this.selectedFiles[controlName];
+    // Update the form control's value with the current file array
+    this.verificationForm.patchValue({ [controlName]: files });
+    this.verificationForm.get(controlName)?.markAsTouched();
+    this.verificationForm.get(controlName)?.updateValueAndValidity();
+    // Regenerate the previews based on the current file array
+    this.previews[controlName] = files.map(file => this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(file)));
   }
 
   onSubmit(): void {
@@ -142,7 +171,6 @@ export class VerifyDriverComponent implements OnInit {
     }
 
     this.isSubmitting = true;
-
     // 1. تجهيز بيانات رفع المستندات الشخصية فقط
     // const docsFormData = new FormData();
     // docsFormData.append('Comment', formValue.description || '');
@@ -163,7 +191,6 @@ export class VerifyDriverComponent implements OnInit {
     (formValue.licenseFile as File[]).forEach(file => driverFormData.append('VehicleDetailsCommand.DriverLicense', file));
     (formValue.driverIdFile as File[]).forEach(file => driverFormData.append('VehicleDetailsCommand.Identity', file));
     (formValue.carLicenseFile as File[]).forEach(file => driverFormData.append('VehicleDetailsCommand.VehicleRegistration', file));
-
     // طباعة محتوى docsFormData
     // for (let pair of docsFormData.entries()) {
     //   console.log('DOCS:', pair[0], pair[1]);
@@ -192,13 +219,12 @@ export class VerifyDriverComponent implements OnInit {
 
   hideToast(): void { this.toast = null; }
 
-  closeSuccessPopup() {
+  closeSuccessPopup(): void {
     this.showSuccessPopup = false;
     this.router.navigate(['/']);
   }
 
   private markStepAsTouched(): void {
-    // ✅ UPDATED: Mark controls as touched for each step
     const stepControls: { [key: number]: string[] } = {
       1: ['licenseFile'],
       2: ['carLicenseFile'],

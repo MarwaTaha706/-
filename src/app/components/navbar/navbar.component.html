@@ -50,13 +50,15 @@
     </button> -->
     <button *ngIf="isLoggedInFn() && isVerifiedDriverFn()" (click)="navigateTo('/suggested-trips')"
     class="flex items-center gap-2 rounded text-gray-900 font-bold py-3 px-6 hover:text-[#0BB097] whitespace-nowrap">
-    <i class="bi bi-compass text-xl"></i>
-      <span>الرحلات المقترحة</span>
+    <i class="fa-regular fa-map"></i>
+  <span>الرحلات المقترحة</span>
     </button>
     <button *ngIf="isLoggedInFn()" (click)="navigateTo('/my-suggested-trips')"
       class="flex items-center gap-2 rounded text-gray-900 font-bold py-3 px-6 hover:text-[#0BB097] whitespace-nowrap">
-      <i class="bi bi-person-badge text-xl"></i>
-      <span>رحلاتي المقترحة</span>
+
+        <i class="fa-solid fa-street-view"></i>
+              <span>رحلاتي المقترحة</span>
+    
     </button>
     <button *ngIf="!isLoggedInFn()" (click)="navigateTo('/')" class="hover:text-[#0BB097] border-0 font-bold cursor-pointer">كيف يعمل</button>
     <button *ngIf="isLoggedInFn() && !isVerifiedDriverFn()" (click)="goToVerifyDriver()"

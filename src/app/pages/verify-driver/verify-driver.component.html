@@ -1,251 +1,278 @@
-<!-- src/app/pages/verify-driver/verify-driver.component.html -->
-
 <div class="verify-driver-container">
-    <!-- Hero Section -->
-    <div class="hero-section">
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-lg-8 text-center">
-            <div class="hero-content">
-              <div class="icon-wrapper mb-4"><fa-icon [icon]="icons.main" size="3x"></fa-icon></div>
-              <h1 class="hero-title">توثيق حساب السائق</h1>
-              <p class="hero-subtitle">أكمل الخطوات التالية لتصبح سائقًا موثوقًا في مجتمعنا</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  
-    <!-- Main Content -->
-    <div class="main-content">
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-lg-10">
-  
-            <!-- ✅ UPDATED Progress Steps -->
-            <div class="steps-container mb-5">
-              <div class="steps-wrapper">
-                <!-- Step 1 -->
-                <div class="step" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
-                  <div class="step-icon"><fa-icon [icon]="icons.license"></fa-icon></div>
-                  <div class="step-title">رخصة القيادة</div>
-                </div>
-                <div class="step-line" [class.completed]="currentStep > 1"></div>
-                <!-- Step 2: Car License -->
-                <div class="step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
-                  <div class="step-icon"><fa-icon [icon]="icons.carLicense"></fa-icon></div>
-                  <div class="step-title">رخصة السيارة</div>
-                </div>
-                <div class="step-line" [class.completed]="currentStep > 2"></div>
-                <!-- Step 3 -->
-                <div class="step" [class.active]="currentStep >= 3" [class.completed]="currentStep > 3">
-                  <div class="step-icon"><fa-icon [icon]="icons.identity"></fa-icon></div>
-                  <div class="step-title">الهوية</div>
-                </div>
-                <div class="step-line" [class.completed]="currentStep > 3"></div>
-                <!-- Step 4 -->
-                <div class="step" [class.active]="currentStep >= 4" [class.completed]="currentStep > 4">
-                   <div class="step-icon"><fa-icon [icon]="icons.camera"></fa-icon></div>
-                  <div class="step-title">صور المركبة</div>
-                </div>
-                <div class="step-line" [class.completed]="currentStep > 4"></div>
-                <!-- Step 5 -->
-                <div class="step" [class.active]="currentStep >= 5" [class.completed]="currentStep > 5">
-                 <div class="step-icon"><fa-icon [icon]="icons.vehicle"></fa-icon></div>
-                  <div class="step-title">بيانات المركبة</div>
-                </div>
-                <div class="step-line" [class.completed]="currentStep > 5"></div>
-                <!-- Step 6 -->
-                <div class="step" [class.active]="currentStep >= 6">
-                  <div class="step-icon"><fa-icon [icon]="icons.review"></fa-icon></div>
-                  <div class="step-title">المراجعة</div>
-                </div>
-              </div>
-            </div>
-  
-            <!-- Form Card -->
-            <div class="form-card">
-              <div class="card-header">
-                <h3 class="step-title-main mb-3"><fa-icon [icon]="icons.edit" class="me-2"></fa-icon>{{ getStepTitle() }}</h3>
-                <p class="step-description">الخطوة {{ currentStep }} من {{ totalSteps }}</p>
-              </div>
-  
-              <div class="card-body">
-                <form [formGroup]="verificationForm" (ngSubmit)="onSubmit()">
-                  
-                  <!-- Step 1: Driver License -->
-                  <div *ngIf="currentStep === 1" class="step-content">
-                    <div class="mb-4">
-                      <label class="form-label" for="licenseFile">صور رخصة القيادة (اختر صورة أو أكثر)</label>
-                      <input id="licenseFile" type="file" class="form-control" [class.is-invalid]="f['licenseFile'].invalid && f['licenseFile'].touched" (change)="onFileSelected($event, 'licenseFile')" accept="image/*" multiple>
-                      <div *ngIf="f['licenseFile'].invalid && f['licenseFile'].touched" class="field-error-message">
-                        <div *ngIf="f['licenseFile'].errors?.['required']">صورة رخصة القيادة مطلوبة.</div>
-                      </div>
-                    </div>
-                    <div *ngIf="previews['licenseFile'] && previews['licenseFile'].length" class="image-preview-multiple">
-                      <div *ngFor="let url of previews['licenseFile']" class="preview-item"><img [src]="url" alt="معاينة الرخصة"></div>
-                    </div>
-                  </div>
+ 
+  <div class="main-content">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
 
-                  <!-- ✅ ADDED Step 2: Car License -->
-                  <div *ngIf="currentStep === 2" class="step-content">
-                    <div class="mb-4">
-                      <label class="form-label" for="carLicenseFile">صور رخصة السيارة (اختر صورة أو أكثر)</label>
-                      <input id="carLicenseFile" type="file" class="form-control" [class.is-invalid]="f['carLicenseFile'].invalid && f['carLicenseFile'].touched" (change)="onFileSelected($event, 'carLicenseFile')" accept="image/*" multiple>
-                      <div *ngIf="f['carLicenseFile'].invalid && f['carLicenseFile'].touched" class="field-error-message">
-                        <div *ngIf="f['carLicenseFile'].errors?.['required']">صورة رخصة السيارة مطلوبة.</div>
-                      </div>
-                    </div>
-                    <div *ngIf="previews['carLicenseFile'] && previews['carLicenseFile'].length" class="image-preview-multiple">
-                      <div *ngFor="let url of previews['carLicenseFile']" class="preview-item"><img [src]="url" alt="معاينة رخصة السيارة"></div>
-                    </div>
-                  </div>
-  
-                  <!-- Step 3: Driver ID -->
-                  <div *ngIf="currentStep === 3" class="step-content">
-                    <div class="mb-4">
-                      <label class="form-label" for="driverIdFile">صور هوية السائق (اختر صورة أو أكثر)</label>
-                      <input id="driverIdFile" type="file" class="form-control" [class.is-invalid]="f['driverIdFile'].invalid && f['driverIdFile'].touched" (change)="onFileSelected($event, 'driverIdFile')" accept="image/*" multiple>
-                      <div *ngIf="f['driverIdFile'].invalid && f['driverIdFile'].touched" class="field-error-message">
-                        <div *ngIf="f['driverIdFile'].errors?.['required']">صورة هوية السائق مطلوبة.</div>
-                      </div>
-                    </div>
-                    <div *ngIf="previews['driverIdFile'] && previews['driverIdFile'].length" class="image-preview-multiple">
-                      <div *ngFor="let url of previews['driverIdFile']" class="preview-item"><img [src]="url" alt="معاينة الهوية"></div>
-                    </div>
-                  </div>
-  
-                  <!-- Step 4: Vehicle Images -->
-                  <div *ngIf="currentStep === 4" class="step-content">
-                    <div class="mb-4">
-                      <label class="form-label" for="vehicleImages">صور المركبة (اختر صورة أو أكثر)</label>
-                      <input id="vehicleImages" type="file" class="form-control" [class.is-invalid]="f['vehicleImages'].invalid && f['vehicleImages'].touched" (change)="onFileSelected($event, 'vehicleImages')" accept="image/*" multiple>
-                      <div *ngIf="f['vehicleImages'].invalid && f['vehicleImages'].touched" class="field-error-message">
-                          <div *ngIf="f['vehicleImages'].errors?.['required']">صور المركبة مطلوبة.</div>
-                      </div>
-                    </div>
-                    <div *ngIf="previews['vehicleImages'] && previews['vehicleImages'].length" class="image-preview-multiple">
-                      <div *ngFor="let url of previews['vehicleImages']" class="preview-item"><img [src]="url" alt="معاينة صورة المركبة"></div>
-                    </div>
-                  </div>
-  
-                  <!-- Step 5: Vehicle Information -->
-                  <div *ngIf="currentStep === 5" class="step-content">
-                    <div class="row">
-                      <div class="col-md-6 mb-3">
-                        <label class="form-label" for="vehicleMake">ماركة المركبة</label>
-                        <select id="vehicleMake" class="form-select" formControlName="vehicleMake" [class.is-invalid]="f['vehicleMake'].invalid && f['vehicleMake'].touched">
-                          <option value="" disabled>اختر الماركة</option>
-                          <option value="تويوتا">تويوتا</option><option value="كيا">كيا</option><option value="نيسان">نيسان</option><option value="هيونداي">هيونداي</option>
-                        </select>
-                        <div *ngIf="f['vehicleMake'].invalid && f['vehicleMake'].touched" class="field-error-message"><div *ngIf="f['vehicleMake'].errors?.['required']">ماركة المركبة مطلوبة.</div></div>
-                      </div>
-                      <div class="col-md-6 mb-3">
-                        <label class="form-label" for="vehicleModel">موديل المركبة</label>
-                        <input id="vehicleModel" type="text" class="form-control" formControlName="vehicleModel" [class.is-invalid]="f['vehicleModel'].invalid && f['vehicleModel'].touched" placeholder="مثال: كامري">
-                        <div *ngIf="f['vehicleModel'].invalid && f['vehicleModel'].touched" class="field-error-message"><div *ngIf="f['vehicleModel'].errors?.['required']">موديل المركبة مطلوب.</div></div>
-                      </div>
-                      <div class="col-md-6 mb-3">
-                        <label class="form-label" for="vehicleColor">اللون</label>
-                        <input id="vehicleColor" type="text" class="form-control" formControlName="vehicleColor" [class.is-invalid]="f['vehicleColor'].invalid && f['vehicleColor'].touched" placeholder="مثال: أبيض">
-                        <div *ngIf="f['vehicleColor'].invalid && f['vehicleColor'].touched" class="field-error-message"><div *ngIf="f['vehicleColor'].errors?.['required']">لون المركبة مطلوب.</div></div>
-                      </div>
-                      <div class="col-md-6 mb-3">
-                        <label class="form-label" for="vehicleSeats">عدد المقاعد</label>
-                        <input id="vehicleSeats" type="number" class="form-control" formControlName="vehicleSeats" [class.is-invalid]="f['vehicleSeats'].invalid && f['vehicleSeats'].touched" placeholder="مثال: 4">
-                        <div *ngIf="f['vehicleSeats'].invalid && f['vehicleSeats'].touched" class="field-error-message">
-                            <div *ngIf="f['vehicleSeats'].errors?.['required']">عدد المقاعد مطلوب.</div>
-                            <div *ngIf="f['vehicleSeats'].errors?.['min']">يجب أن يكون هناك مقعد واحد على الأقل.</div>
-                        </div>
-                      </div>
-                      <div class="col-md-6 mb-3">
-                          <label class="form-label" for="plateNumber">رقم اللوحة</label>
-                          <input id="plateNumber" type="text" class="form-control" formControlName="plateNumber" [class.is-invalid]="f['plateNumber'].invalid && f['plateNumber'].touched" placeholder="أ ب ج 1234">
-                          <div *ngIf="f['plateNumber'].invalid && f['plateNumber'].touched" class="field-error-message"><div *ngIf="f['plateNumber'].errors?.['required']">رقم اللوحة مطلوب.</div></div>
-                      </div>
-                      <div class="col-12">
-                        <label class="form-label" for="description">نبذة تعريفية (اختياري)</label>
-                        <textarea id="description" class="form-control" formControlName="description" rows="3" placeholder="أي معلومات إضافية تود مشاركتها..."></textarea>
-                      </div>
-                    </div>
-                  </div>
-  
-                  <!-- Step 6: Review -->
-                  <div *ngIf="currentStep === 6" class="step-content">
-                    <h5 class="mb-4">مراجعة البيانات النهائية</h5>
-                    <div class="review-section">
-                      <h6><fa-icon [icon]="icons.license" class="me-2"></fa-icon>رخصة القيادة</h6>
-                      <div class="image-preview-multiple" *ngIf="previews['licenseFile'] && previews['licenseFile'].length">
-                          <div *ngFor="let url of previews['licenseFile']" class="preview-item"><img [src]="url" class="review-image-small"></div>
-                      </div>
-                       <p *ngIf="!previews['licenseFile'] || !previews['licenseFile'].length" class="text-muted">لم يتم رفع صور لرخصة القيادة.</p>
-                    </div>
-                    <!-- ✅ ADDED Car License Review Section -->
-                    <div class="review-section">
-                      <h6><fa-icon [icon]="icons.carLicense" class="me-2"></fa-icon>رخصة السيارة</h6>
-                      <div class="image-preview-multiple" *ngIf="previews['carLicenseFile'] && previews['carLicenseFile'].length">
-                          <div *ngFor="let url of previews['carLicenseFile']" class="preview-item"><img [src]="url" class="review-image-small"></div>
-                      </div>
-                       <p *ngIf="!previews['carLicenseFile'] || !previews['carLicenseFile'].length" class="text-muted">لم يتم رفع صور لرخصة السيارة.</p>
-                    </div>
-                    <div class="review-section">
-                      <h6><fa-icon [icon]="icons.identity" class="me-2"></fa-icon>هوية السائق</h6>
-                      <div class="image-preview-multiple" *ngIf="previews['driverIdFile'] && previews['driverIdFile'].length">
-                          <div *ngFor="let url of previews['driverIdFile']" class="preview-item"><img [src]="url" class="review-image-small"></div>
-                      </div>
-                       <p *ngIf="!previews['driverIdFile'] || !previews['driverIdFile'].length" class="text-muted">لم يتم رفع صور للهوية.</p>
-                    </div>
-                    <div class="review-section">
-                      <h6><fa-icon [icon]="icons.camera" class="me-2"></fa-icon>صور المركبة</h6>
-                      <div class="image-preview-multiple" *ngIf="previews['vehicleImages'] && previews['vehicleImages'].length">
-                          <div *ngFor="let url of previews['vehicleImages']" class="preview-item"><img [src]="url" class="review-image-small"></div>
-                      </div>
-                       <p *ngIf="!previews['vehicleImages'] || !previews['vehicleImages'].length" class="text-muted">لم يتم رفع صور للمركبة.</p>
-                    </div>
-                    <div class="review-section">
-                      <h6><fa-icon [icon]="icons.vehicle" class="me-2"></fa-icon>بيانات المركبة</h6>
-                      <p><strong>النوع:</strong> {{ verificationForm.value.vehicleMake }} - {{ verificationForm.value.vehicleModel }}</p>
-                      <p><strong>اللون:</strong> {{ verificationForm.value.vehicleColor }}</p>
-                      <p><strong>عدد المقاعد:</strong> {{ verificationForm.value.vehicleSeats }}</p>
-                      <p><strong>رقم اللوحة:</strong> {{ verificationForm.value.plateNumber }}</p>
-                    </div>
-                  </div>
-                </form>
+        
+          <div class="steps-container mb-5">
+            
+            <!-- Hero Section -->
+            <div class="hero-section">
+              <div class="hero-content">
+                <!-- <div class="icon-wrapper mb-4">
+                  <fa-icon [icon]="icons.main" size="3x"></fa-icon>
+                </div> -->
+                 <h1 class="hero-title"><fa-icon [icon]="icons.main"></fa-icon> توثيق حساب السائق</h1>
+                <p class="hero-subtitle">أكمل الخطوات التالية لتصبح سائقًا موثوقًا في مجتمعنا</p>
               </div>
-  
-              <!-- Navigation Buttons -->
-              <div class="card-footer">
-                <div class="d-flex justify-content-between">
-                  <button type="button" class="btn btn-outline-secondary" [disabled]="currentStep === 1" (click)="previousStep()">
-                    <fa-icon [icon]="icons.prev" class="me-2"></fa-icon> السابق
-                  </button>
-                  <button *ngIf="currentStep < totalSteps" type="button" class="btn btn-primary" [disabled]="!isStepValid()" (click)="nextStep()">
-                    التالي <fa-icon [icon]="icons.next" class="ms-2"></fa-icon>
-                  </button>
-                  <button *ngIf="currentStep === totalSteps" type="button" class="btn btn-success" [disabled]="!verificationForm.valid || isSubmitting" (click)="onSubmit()">
-                    <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    <fa-icon *ngIf="!isSubmitting" [icon]="icons.success" class="me-2"></fa-icon>
-                    {{ isSubmitting ? 'جاري الإرسال...' : 'إرسال الطلب' }}
-                  </button>
+            </div>
+
+            <!-- The actual steps progress bar -->
+            <div class="steps-wrapper">
+              <!-- Step 1 -->
+              <div class="step" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
+                <div class="step-icon"><fa-icon [icon]="icons.license"></fa-icon></div>
+                <div class="step-title">رخصة القيادة</div>
+              </div>
+              <div class="step-line" [class.completed]="currentStep > 1"></div>
+              <!-- Step 2: Car License -->
+              <div class="step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
+                <div class="step-icon"><fa-icon [icon]="icons.carLicense"></fa-icon></div>
+                <div class="step-title">رخصة السيارة</div>
+              </div>
+              <div class="step-line" [class.completed]="currentStep > 2"></div>
+              <!-- Step 3 -->
+              <div class="step" [class.active]="currentStep >= 3" [class.completed]="currentStep > 3">
+                <div class="step-icon"><fa-icon [icon]="icons.identity"></fa-icon></div>
+                <div class="step-title">الهوية</div>
+              </div>
+              <div class="step-line" [class.completed]="currentStep > 3"></div>
+              <!-- Step 4 -->
+              <div class="step" [class.active]="currentStep >= 4" [class.completed]="currentStep > 4">
+                 <div class="step-icon"><fa-icon [icon]="icons.camera"></fa-icon></div>
+                <div class="step-title">صور المركبة</div>
+              </div>
+              <div class="step-line" [class.completed]="currentStep > 4"></div>
+              <!-- Step 5 -->
+              <div class="step" [class.active]="currentStep >= 5" [class.completed]="currentStep > 5">
+               <div class="step-icon"><fa-icon [icon]="icons.vehicle"></fa-icon></div>
+                <div class="step-title">بيانات المركبة</div>
+              </div>
+              <div class="step-line" [class.completed]="currentStep > 5"></div>
+              <!-- Step 6 -->
+              <div class="step" [class.active]="currentStep >= 6">
+                <div class="step-icon"><fa-icon [icon]="icons.review"></fa-icon></div>
+                <div class="step-title">المراجعة</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Card -->
+          <div class="form-card">
+            <div class="card-header">
+              <h3 class="step-title-main mb-3"><fa-icon [icon]="icons.edit" class="me-2"></fa-icon>{{ getStepTitle() }}</h3>
+              <p class="step-description">الخطوة {{ currentStep }} من {{ totalSteps }}</p>
+            </div>
+
+            <div class="card-body">
+              <form [formGroup]="verificationForm" (ngSubmit)="onSubmit()">
+                
+                <!-- Step 1: Driver License -->
+                <div *ngIf="currentStep === 1" class="step-content">
+                  <div class="mb-4">
+                    <label class="form-label" for="licenseFile">صور رخصة القيادة (اختر صورة أو أكثر)</label>
+                    <input id="licenseFile" type="file" class="form-control" (change)="onFileSelected($event, 'licenseFile')" accept="image/*" multiple>
+                    <div *ngIf="f['licenseFile'].invalid && f['licenseFile'].touched" class="field-error-message">
+                      <div *ngIf="f['licenseFile'].errors?.['required']">صورة رخصة القيادة مطلوبة.</div>
+                    </div>
+                  </div>
+                  <div *ngIf="previews['licenseFile']?.length" class="image-preview-multiple">
+                    <div *ngFor="let url of previews['licenseFile']; let i = index" class="preview-item">
+                      <img [src]="url" alt="معاينة الرخصة">
+                      <!-- ✅ FIXED: Removed the third argument -->
+                      <button type="button" class="remove-image-btn" (click)="removeImage('licenseFile', i)"><fa-icon [icon]="icons.close"></fa-icon></button>
+                    </div>
+                  </div>
                 </div>
+
+                <!-- Step 2: Car License -->
+                <div *ngIf="currentStep === 2" class="step-content">
+                  <div class="mb-4">
+                    <label class="form-label" for="carLicenseFile">صور رخصة السيارة (اختر صورة أو أكثر)</label>
+                    <input id="carLicenseFile" type="file" class="form-control" (change)="onFileSelected($event, 'carLicenseFile')" accept="image/*" multiple>
+                    <div *ngIf="f['carLicenseFile'].invalid && f['carLicenseFile'].touched" class="field-error-message">
+                      <div *ngIf="f['carLicenseFile'].errors?.['required']">صورة رخصة السيارة مطلوبة.</div>
+                    </div>
+                  </div>
+                  <div *ngIf="previews['carLicenseFile']?.length" class="image-preview-multiple">
+                    <div *ngFor="let url of previews['carLicenseFile']; let i = index" class="preview-item">
+                      <img [src]="url" alt="معاينة رخصة السيارة">
+                      <!-- ✅ FIXED: Removed the third argument -->
+                      <button type="button" class="remove-image-btn" (click)="removeImage('carLicenseFile', i)"><fa-icon [icon]="icons.close"></fa-icon></button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Step 3: Driver ID -->
+                <div *ngIf="currentStep === 3" class="step-content">
+                  <div class="mb-4">
+                    <label class="form-label" for="driverIdFile">صور هوية السائق (اختر صورة أو أكثر)</label>
+                    <input id="driverIdFile" type="file" class="form-control" (change)="onFileSelected($event, 'driverIdFile')" accept="image/*" multiple>
+                    <div *ngIf="f['driverIdFile'].invalid && f['driverIdFile'].touched" class="field-error-message">
+                      <div *ngIf="f['driverIdFile'].errors?.['required']">صورة هوية السائق مطلوبة.</div>
+                    </div>
+                  </div>
+                  <div *ngIf="previews['driverIdFile']?.length" class="image-preview-multiple">
+                    <div *ngFor="let url of previews['driverIdFile']; let i = index" class="preview-item">
+                      <img [src]="url" alt="معاينة الهوية">
+                      <!-- ✅ FIXED: Removed the third argument -->
+                      <button type="button" class="remove-image-btn" (click)="removeImage('driverIdFile', i)"><fa-icon [icon]="icons.close"></fa-icon></button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Step 4: Vehicle Images -->
+                <div *ngIf="currentStep === 4" class="step-content">
+                  <div class="mb-4">
+                    <label class="form-label" for="vehicleImages">صور المركبة (اختر صورة أو أكثر)</label>
+                    <input id="vehicleImages" type="file" class="form-control" (change)="onFileSelected($event, 'vehicleImages')" accept="image/*" multiple>
+                    <div *ngIf="f['vehicleImages'].invalid && f['vehicleImages'].touched" class="field-error-message">
+                        <div *ngIf="f['vehicleImages'].errors?.['required']">صور المركبة مطلوبة.</div>
+                    </div>
+                  </div>
+                  <div *ngIf="previews['vehicleImages']?.length" class="image-preview-multiple">
+                    <div *ngFor="let url of previews['vehicleImages']; let i = index" class="preview-item">
+                      <img [src]="url" alt="معاينة صورة المركبة">
+                      <!-- ✅ FIXED: Removed the third argument -->
+                      <button type="button" class="remove-image-btn" (click)="removeImage('vehicleImages', i)"><fa-icon [icon]="icons.close"></fa-icon></button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Step 5: Vehicle Information -->
+                <div *ngIf="currentStep === 5" class="step-content">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label" for="vehicleMake">ماركة المركبة</label>
+                      <select id="vehicleMake" class="form-select" formControlName="vehicleMake" [class.is-invalid]="f['vehicleMake'].invalid && f['vehicleMake'].touched">
+                        <option value="" disabled>اختر الماركة</option>
+                        <option value="تويوتا">تويوتا</option><option value="كيا">كيا</option><option value="نيسان">نيسان</option><option value="هيونداي">هيونداي</option>
+                      </select>
+                      <div *ngIf="f['vehicleMake'].invalid && f['vehicleMake'].touched" class="field-error-message"><div *ngIf="f['vehicleMake'].errors?.['required']">ماركة المركبة مطلوبة.</div></div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label" for="vehicleModel">موديل المركبة</label>
+                      <input id="vehicleModel" type="text" class="form-control" formControlName="vehicleModel" [class.is-invalid]="f['vehicleModel'].invalid && f['vehicleModel'].touched" placeholder="مثال: كامري">
+                      <div *ngIf="f['vehicleModel'].invalid && f['vehicleModel'].touched" class="field-error-message"><div *ngIf="f['vehicleModel'].errors?.['required']">موديل المركبة مطلوب.</div></div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label" for="vehicleColor">اللون</label>
+                      <input id="vehicleColor" type="text" class="form-control" formControlName="vehicleColor" [class.is-invalid]="f['vehicleColor'].invalid && f['vehicleColor'].touched" placeholder="مثال: أبيض">
+                      <div *ngIf="f['vehicleColor'].invalid && f['vehicleColor'].touched" class="field-error-message"><div *ngIf="f['vehicleColor'].errors?.['required']">لون المركبة مطلوب.</div></div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label" for="vehicleSeats">عدد المقاعد</label>
+                      <input id="vehicleSeats" type="number" class="form-control" formControlName="vehicleSeats" [class.is-invalid]="f['vehicleSeats'].invalid && f['vehicleSeats'].touched" placeholder="مثال: 4">
+                      <div *ngIf="f['vehicleSeats'].invalid && f['vehicleSeats'].touched" class="field-error-message">
+                          <div *ngIf="f['vehicleSeats'].errors?.['required']">عدد المقاعد مطلوب.</div>
+                          <div *ngIf="f['vehicleSeats'].errors?.['min']">يجب أن يكون هناك مقعد واحد على الأقل.</div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="plateNumber">رقم اللوحة</label>
+                        <input id="plateNumber" type="text" class="form-control" formControlName="plateNumber" [class.is-invalid]="f['plateNumber'].invalid && f['plateNumber'].touched" placeholder="أ ب ج 1234">
+                        <div *ngIf="f['plateNumber'].invalid && f['plateNumber'].touched" class="field-error-message"><div *ngIf="f['plateNumber'].errors?.['required']">رقم اللوحة مطلوب.</div></div>
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label" for="description">نبذة تعريفية (اختياري)</label>
+                      <textarea id="description" class="form-control" formControlName="description" rows="3" placeholder="أي معلومات إضافية تود مشاركتها..."></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Step 6: Review -->
+                <div *ngIf="currentStep === 6" class="step-content">
+                  <h5 class="mb-4">مراجعة البيانات النهائية</h5>
+                  <div class="review-section">
+                    <h6><fa-icon [icon]="icons.license" class="me-2"></fa-icon>رخصة القيادة</h6>
+                    <div class="image-preview-multiple" *ngIf="previews['licenseFile']?.length">
+                        <div *ngFor="let url of previews['licenseFile']; let i = index" class="preview-item">
+                          <img [src]="url" class="review-image-small">
+                          <!-- ✅ FIXED: Removed the third argument -->
+                          <button type="button" class="remove-image-btn" (click)="removeImage('licenseFile', i)"><fa-icon [icon]="icons.close"></fa-icon></button>
+                        </div>
+                    </div>
+                     <p *ngIf="!previews['licenseFile']?.length" class="text-muted">لم يتم رفع صور لرخصة القيادة.</p>
+                  </div>
+                  <div class="review-section">
+                    <h6><fa-icon [icon]="icons.carLicense" class="me-2"></fa-icon>رخصة السيارة</h6>
+                    <div class="image-preview-multiple" *ngIf="previews['carLicenseFile']?.length">
+                        <div *ngFor="let url of previews['carLicenseFile']; let i = index" class="preview-item">
+                          <img [src]="url" class="review-image-small">
+                          <!-- ✅ FIXED: Removed the third argument -->
+                          <button type="button" class="remove-image-btn" (click)="removeImage('carLicenseFile', i)"><fa-icon [icon]="icons.close"></fa-icon></button>
+                        </div>
+                    </div>
+                     <p *ngIf="!previews['carLicenseFile']?.length" class="text-muted">لم يتم رفع صور لرخصة السيارة.</p>
+                  </div>
+                  <div class="review-section">
+                    <h6><fa-icon [icon]="icons.identity" class="me-2"></fa-icon>هوية السائق</h6>
+                    <div class="image-preview-multiple" *ngIf="previews['driverIdFile']?.length">
+                        <div *ngFor="let url of previews['driverIdFile']; let i = index" class="preview-item">
+                          <img [src]="url" class="review-image-small">
+                          <!-- ✅ FIXED: Removed the third argument -->
+                          <button type="button" class="remove-image-btn" (click)="removeImage('driverIdFile', i)"><fa-icon [icon]="icons.close"></fa-icon></button>
+                        </div>
+                    </div>
+                     <p *ngIf="!previews['driverIdFile']?.length" class="text-muted">لم يتم رفع صور للهوية.</p>
+                  </div>
+                  <div class="review-section">
+                    <h6><fa-icon [icon]="icons.camera" class="me-2"></fa-icon>صور المركبة</h6>
+                    <div class="image-preview-multiple" *ngIf="previews['vehicleImages']?.length">
+                        <div *ngFor="let url of previews['vehicleImages']; let i = index" class="preview-item">
+                          <img [src]="url" class="review-image-small">
+                          <!-- ✅ FIXED: Removed the third argument -->
+                          <button type="button" class="remove-image-btn" (click)="removeImage('vehicleImages', i)"><fa-icon [icon]="icons.close"></fa-icon></button>
+                        </div>
+                    </div>
+                     <p *ngIf="!previews['vehicleImages']?.length" class="text-muted">لم يتم رفع صور للمركبة.</p>
+                  </div>
+                  <div class="review-section">
+                    <h6><fa-icon [icon]="icons.vehicle" class="me-2"></fa-icon>بيانات المركبة</h6>
+                    <p><strong>النوع:</strong> {{ verificationForm.value.vehicleMake }} - {{ verificationForm.value.vehicleModel }}</p>
+                    <p><strong>اللون:</strong> {{ verificationForm.value.vehicleColor }}</p>
+                    <p><strong>عدد المقاعد:</strong> {{ verificationForm.value.vehicleSeats }}</p>
+                    <p><strong>رقم اللوحة:</strong> {{ verificationForm.value.plateNumber }}</p>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="card-footer">
+              <div class="d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary" [disabled]="currentStep === 1" (click)="previousStep()">
+                  <fa-icon [icon]="icons.prev" class="me-2"></fa-icon> السابق
+                </button>
+                <button *ngIf="currentStep < totalSteps" type="button" class="btn btn-primary" [disabled]="!isStepValid()" (click)="nextStep()">
+                  التالي <fa-icon [icon]="icons.next" class="ms-2"></fa-icon>
+                </button>
+                <button *ngIf="currentStep === totalSteps" type="button" class="btn btn-success" [disabled]="!verificationForm.valid || isSubmitting" (click)="onSubmit()">
+                  <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  <fa-icon *ngIf="!isSubmitting" [icon]="icons.success" class="me-2"></fa-icon>
+                  {{ isSubmitting ? 'جاري الإرسال...' : 'إرسال الطلب' }}
+                </button>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  
-    <!-- Toast & Success Popup -->
-    <div *ngIf="toast" class="toast-container" [ngClass]="'toast-' + toast.type" [@toastState]>
-      <div class="toast-icon"><fa-icon [icon]="toast.type === 'success' ? icons.success : icons.error" size="lg"></fa-icon></div>
-      <div class="toast-message">{{ toast.message }}</div>
-      <button class="toast-close" (click)="hideToast()"><fa-icon [icon]="icons.close"></fa-icon></button>
-    </div>
-    <div *ngIf="showSuccessPopup" class="modal-backdrop">
-      <div class="modal-popup">
-        <h2>تم إرسال طلبك بنجاح</h2>
-        <p>شكرا علي ثقتك بنا سوف يقوم احد المختصين بمراجعة الطلب لقد تم ارسال طلبك بنجاح</p>
-        <button class="btn btn-primary" (click)="closeSuccessPopup()">حسناً</button>
       </div>
     </div>
   </div>
+
+  <!-- Toast & Success Popup -->
+  <div *ngIf="toast" class="toast-container" [ngClass]="'toast-' + toast.type" [@toastState]>
+    <div class="toast-icon"><fa-icon [icon]="toast.type === 'success' ? icons.success : icons.error" size="lg"></fa-icon></div>
+    <div class="toast-message">{{ toast.message }}</div>
+    <button class="toast-close" (click)="hideToast()"><fa-icon [icon]="icons.close"></fa-icon></button>
+  </div>
+  <div *ngIf="showSuccessPopup" class="modal-backdrop">
+    <div class="modal-popup">
+      <h2>تم إرسال طلبك بنجاح</h2>
+      <p>شكرا علي ثقتك بنا سوف يقوم احد المختصين بمراجعة الطلب لقد تم ارسال طلبك بنجاح</p>
+      <button class="btn btn-primary" (click)="closeSuccessPopup()">حسناً</button>
+    </div>
+  </div>
+</div>
