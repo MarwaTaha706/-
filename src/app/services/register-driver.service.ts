@@ -24,10 +24,10 @@ export class RegisterDriverService {
     );
   }
 
-  uploadDocuments(payload: FormData): Observable<BooleanResponse> {
-    return this.http.post<BooleanResponse>(
-      `${API_BASE_URL}/Account/UploadDocuments`,
-      payload
-    );
-  }
+  // uploadDocuments(payload: FormData): Observable<BooleanResponse> {
+  //   return this.http.post<BooleanResponse>(
+  //     `${API_BASE_URL}/Account/UploadDocuments`,
+  //     payload
+  //   );
+  // }
 }

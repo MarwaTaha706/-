@@ -48,8 +48,9 @@
     </div>
 
     <div class="relative w-1/5">
-      <input type="datetime-local" placeholder="اليوم"
-        class="w-full py-2 px-4 rounded focus:outline-none text-gray-700" />
+      <input type="date" placeholder="اليوم"
+        class="w-full py-2 px-4 rounded focus:outline-none text-gray-700"
+        [(ngModel)]="filterDate" (change)="applyFilters()" />
     </div>
     <!-- Passengers -->
     <!-- <div class="relative w-1/5">

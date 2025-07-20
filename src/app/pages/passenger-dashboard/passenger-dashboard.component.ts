@@ -20,7 +20,7 @@ export interface Location {
 @Component({
   selector: 'app-passenger-dashboard',
   standalone: true,
-  imports: [ NgClass, CommonModule, FormsModule, SuggestTripComponent ],
+  imports: [NgClass, CommonModule, FormsModule, SuggestTripComponent],
   templateUrl: './passenger-dashboard.component.html',
   styleUrls: ['./passenger-dashboard.component.css'],
 })
@@ -39,9 +39,10 @@ export class PassengerDashboardComponent implements OnInit, AfterViewInit, OnDes
   filterPrice: number | null = null;
   filterRate: number | null = null;
   filterGender: string = '';
+  filterDate: string = '';
   filteredRides: TripCard[] = [];
 
-  constructor(private tripService: TripService, private router: Router, private authService: AuthService) {}
+  constructor(private tripService: TripService, private router: Router, private authService: AuthService) { }
 
   @Output() locationChange = new EventEmitter<{
     pickup: Location | null;
@@ -98,6 +99,9 @@ export class PassengerDashboardComponent implements OnInit, AfterViewInit, OnDes
           this.filteredRides = [...this.rides];
           this.totalPages = response.data.totalPages;
           this.totalCount = response.data.totalCount;
+          this.applyFilters(); // ← هنا
+
+        
         });
     } else {
       this.tripService.getAllTrips(this.pageNumber, this.pageSize).subscribe((response: any) => {
@@ -105,6 +109,8 @@ export class PassengerDashboardComponent implements OnInit, AfterViewInit, OnDes
         this.filteredRides = [...this.rides];
         this.totalPages = response.data.totalPages;
         this.totalCount = response.data.totalCount;
+        this.applyFilters(); // ← هنا
+
       });
     }
   }
@@ -148,10 +154,10 @@ export class PassengerDashboardComponent implements OnInit, AfterViewInit, OnDes
     if (this.authService.isLoggedIn()) {
       // إذا كان مسجلاً، افتح النافذة المنبثقة كالمعتاد
       this.isSuggestTripModalVisible = true;
-    }else {
-  alert('يجب عليك تسجيل الدخول أولاً لاقتراح رحلة.');
-  this.router.navigate(['/auth'], { queryParams: { returnUrl: '/passenger-dashboard' } });
-}
+    } else {
+      alert('يجب عليك تسجيل الدخول أولاً لاقتراح رحلة.');
+      this.router.navigate(['/auth'], { queryParams: { returnUrl: '/passenger-dashboard' } });
+    }
   }
 
   closeSuggestTripModal(): void {
@@ -161,7 +167,7 @@ export class PassengerDashboardComponent implements OnInit, AfterViewInit, OnDes
     this.map = L.map("map").setView(this.defaultCenter, 13);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    } ).addTo(this.map);
+    }).addTo(this.map);
     this.map.on("click", (e: L.LeafletMouseEvent) => { this.onMapClick(e.latlng); });
   }
 
@@ -177,14 +183,12 @@ export class PassengerDashboardComponent implements OnInit, AfterViewInit, OnDes
       return `${location.lat}, ${location.lng}`;
     }
   }
-
   private async setPickupLocation(location: Location): Promise<void> {
     this.pickupLocation = location;
 
     if (this.pickupMarker) {
       this.map.removeLayer(this.pickupMarker);
     }
-
     const greenIcon = new L.Icon({
       iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
       shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
@@ -269,33 +273,33 @@ export class PassengerDashboardComponent implements OnInit, AfterViewInit, OnDes
     });
   }
 
-    // Set marker and location by address (from input field)
-    async setLocationByAddress(type: 'from' | 'to', address: string): Promise<void> {
-      if (!address.trim()) return;
-      try {
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&accept-language=ar`
-        );
-        const data = await response.json();
-        if (data && data.length > 0) {
-          const { lat, lon } = data[0];
-          const location: Location = { lat: parseFloat(lat), lng: parseFloat(lon) };
-          if (type === 'from') {
-            await this.setPickupLocation(location);
-            this.isSelectingPickup = false;
-            this.map.setView([location.lat, location.lng], 15);
-          } else {
-            await this.setDropoffLocation(location);
-            this.map.setView([location.lat, location.lng], 15);
-          }
-          this.emitLocationChange();
+  // Set marker and location by address (from input field)
+  async setLocationByAddress(type: 'from' | 'to', address: string): Promise<void> {
+    if (!address.trim()) return;
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&accept-language=ar`
+      );
+      const data = await response.json();
+      if (data && data.length > 0) {
+        const { lat, lon } = data[0];
+        const location: Location = { lat: parseFloat(lat), lng: parseFloat(lon) };
+        if (type === 'from') {
+          await this.setPickupLocation(location);
+          this.isSelectingPickup = false;
+          this.map.setView([location.lat, location.lng], 15);
+        } else {
+          await this.setDropoffLocation(location);
+          this.map.setView([location.lat, location.lng], 15);
         }
-      } catch (error) {
-        console.error('خطأ في البحث عن العنوان:', error);
+        this.emitLocationChange();
       }
+    } catch (error) {
+      console.error('خطأ في البحث عن العنوان:', error);
     }
-  
-  
+  }
+
+
   // Updated method with proper typing and null check
   onInputChange(type: string, event: Event): void {
     const target = event.target as HTMLInputElement;
@@ -341,9 +345,18 @@ export class PassengerDashboardComponent implements OnInit, AfterViewInit, OnDes
 
       const carTypeMatch = !this.filterCarType || ride.carType === this.filterCarType;
       const genderMatch = !this.filterGender || ride.driverGender === this.filterGender;
-      // أضف أي فلاتر أخرى مثل السعر أو المقاعد هنا إذا أردت
 
-      return fromMatch && toMatch && carTypeMatch && genderMatch;
+      // فلترة التاريخ (اليوم فقط)
+      let dateMatch = true;
+      if (this.filterDate) {
+        // استخراج yyyy-mm-dd من filterDate
+        const filterDateOnly = this.filterDate.slice(0, 10);
+        // استخراج yyyy-mm-dd من تاريخ الرحلة
+        const rideDateOnly = new Date(ride.departureTime).toISOString().slice(0, 10);
+        dateMatch = rideDateOnly === filterDateOnly;
+      }
+
+      return fromMatch && toMatch && carTypeMatch && genderMatch && dateMatch;
     });
   }
 
@@ -353,6 +366,7 @@ export class PassengerDashboardComponent implements OnInit, AfterViewInit, OnDes
     this.filterPrice = null;
     this.filterRate = null;
     this.filterGender = '';
+    this.filterDate = '';
     this.filteredRides = [...this.rides];
   }
 

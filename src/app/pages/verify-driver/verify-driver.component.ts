@@ -129,6 +129,12 @@ export class VerifyDriverComponent implements OnInit {
       return;
     }
 
+    const formValue = this.verificationForm.value;
+    if (!formValue.licenseFile?.length || !formValue.carLicenseFile?.length || !formValue.driverIdFile?.length || !formValue.vehicleImages?.length) {
+      this.showToast('جميع مستندات التوثيق مطلوبة (رخصة القيادة، رخصة السيارة، الهوية، صور المركبة).', 'error');
+      return;
+    }
+
     const currentUserId = this.authService.getCurrentUserId();
     if (!currentUserId) {
       this.showToast('لا يمكن تحديد هوية المستخدم. الرجاء تسجيل الدخول مرة أخرى.', 'error');
@@ -136,37 +142,45 @@ export class VerifyDriverComponent implements OnInit {
     }
 
     this.isSubmitting = true;
-    const formValue = this.verificationForm.value;
-    const formData = new FormData();
-    
-    // Append text data
-    formData.append('ApplicationUserId', currentUserId);
-    formData.append('DriverDescription', formValue.description || '');
-    formData.append('VehicleDetailsCommand.DriverId', currentUserId);
-    formData.append('VehicleDetailsCommand.Model', formValue.vehicleModel);
-    formData.append('VehicleDetailsCommand.Color', formValue.vehicleColor);
-    formData.append('VehicleDetailsCommand.PlateNumber', formValue.plateNumber);
-    formData.append('VehicleDetailsCommand.SeatsNumber', formValue.vehicleSeats.toString());
-    formData.append('VehicleDetailsCommand.Description', formValue.description || '');
 
-    // Append all files
-    (formValue.licenseFile as File[]).forEach(file => formData.append('DriverLicense', file));
-    (formValue.carLicenseFile as File[]).forEach(file => formData.append('CarLicense', file)); // ✅ ADDED: Append car license files
-    (formValue.driverIdFile as File[]).forEach(file => formData.append('Identity', file));
-    (formValue.vehicleImages as File[]).forEach(file => formData.append('VehicleRegistration', file));
+    // 1. تجهيز بيانات رفع المستندات الشخصية فقط
+    // const docsFormData = new FormData();
+    // docsFormData.append('Comment', formValue.description || '');
+    // (formValue.licenseFile as File[]).forEach(file => docsFormData.append('DriverLicense', file));
+    // (formValue.driverIdFile as File[]).forEach(file => docsFormData.append('Identity', file));
+    // // VehicleRegistration هنا تعني رخصة السيارة فقط
+    // (formValue.carLicenseFile as File[]).forEach(file => docsFormData.append('VehicleRegistration', file));
+    const driverFormData = new FormData();
+    driverFormData.append('DriverDescription', formValue.description || '');
+    driverFormData.append('VehicleDetailsCommand.DriverId', currentUserId);
+    driverFormData.append('VehicleDetailsCommand.Model', formValue.vehicleModel);
+    driverFormData.append('VehicleDetailsCommand.Color', formValue.vehicleColor);
+    driverFormData.append('VehicleDetailsCommand.PlateNumber', formValue.plateNumber);
+    driverFormData.append('VehicleDetailsCommand.SeatsNumber', formValue.vehicleSeats.toString());
+    driverFormData.append('VehicleDetailsCommand.Description', formValue.description || '');
+    // VehicleImageUrls هنا تعني صور السيارة فقط
+    (formValue.vehicleImages as File[]).forEach(file => driverFormData.append('VehicleDetailsCommand.VehicleImageUrls', file));
+    (formValue.licenseFile as File[]).forEach(file => driverFormData.append('VehicleDetailsCommand.DriverLicense', file));
+    (formValue.driverIdFile as File[]).forEach(file => driverFormData.append('VehicleDetailsCommand.Identity', file));
+    (formValue.carLicenseFile as File[]).forEach(file => driverFormData.append('VehicleDetailsCommand.VehicleRegistration', file));
 
-    this.registerDriverService.registerDriver(formData)
+    // طباعة محتوى docsFormData
+    // for (let pair of docsFormData.entries()) {
+    //   console.log('DOCS:', pair[0], pair[1]);
+    // }
+
+    this.registerDriverService.registerDriver(driverFormData)
       .pipe(finalize(() => this.isSubmitting = false))
       .subscribe({
-        next: (response) => {
-          if (response.data) {
+        next: (regRes) => {
+          if (regRes && regRes.status === 200) {
             this.showSuccessPopup = true;
           } else {
-            this.showToast(response.message || 'فشل إرسال الطلب.', 'error');
+            this.showToast(regRes?.message || 'فشل إرسال بيانات السائق.', 'error');
           }
         },
         error: (err) => {
-          this.showToast(err.error?.message || 'حدث خطأ غير متوقع.', 'error');
+          this.showToast(err.error?.message || 'حدث خطأ أثناء إرسال بيانات السائق.', 'error');
         }
       });
   }
@@ -192,7 +206,7 @@ export class VerifyDriverComponent implements OnInit {
       4: ['vehicleImages'],
       5: ['vehicleMake', 'vehicleModel', 'vehicleColor', 'vehicleSeats', 'plateNumber']
     };
-    
+
     const controlsToTouch = stepControls[this.currentStep];
     if (controlsToTouch) {
       controlsToTouch.forEach(field => this.f[field]?.markAsTouched());
