@@ -149,7 +149,7 @@
 </div>
 
 <!-- Modal Overlay -->
-<div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+<div *ngIf="showModal" class="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center z-50">
   <div class="bg-white rounded-xl p-6 w-80 shadow-lg relative">
     <button (click)="closeModal()"
       class="absolute top-2 left-2 text-gray-400 hover:text-gray-600 text-xl">&times;</button>
@@ -170,10 +170,10 @@
 </div>
 
 <!-- رسالة انتظار الرد -->
-<div *ngIf="showWaitMessage" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+<!-- <div *ngIf="showWaitMessage" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
   <div class="bg-white rounded-xl p-6 w-72 shadow-lg text-center">
     <div class="text-lg font-bold mb-2">انتظر الرد</div>
     <div class="text-gray-600">تم إرسال طلبك بنجاح، يرجى انتظار موافقة السائق.</div>
     <button (click)="closeWaitMessage()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">حسناً</button>
   </div>
-</div>
+</div> -->

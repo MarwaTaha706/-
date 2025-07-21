@@ -19,6 +19,8 @@ export class TripDetailsComponent implements OnInit {
   modalSeats: number = 1;
   suggestedPrice: number = 0;
   trip: any = null;
+  bookingResponse: any = null;
+  bookingError: any = null;
 
   constructor(private route: ActivatedRoute, private tripService: TripService) {
     this.tripId = this.route.snapshot.paramMap.get('id');
@@ -46,10 +48,26 @@ export class TripDetailsComponent implements OnInit {
   }
 
   confirmBooking() {
-    this.showModal = false;
-    this.showWaitMessage = true;
-    // هنا يمكنك إرسال البيانات للـ backend لاحقاً:
-    // this.tripService.bookRide(this.tripId, this.modalSeats, this.suggestedPrice).subscribe(...)
+    const seats = this.modalSeats;
+    const price = this.suggestedPrice;
+    const total = seats * price;
+    if (!this.tripId) {
+      alert('لا يوجد رقم رحلة!');
+      return;
+    }
+    this.tripService.bookRide(this.tripId, seats, total).subscribe({
+      next: (res) => {
+        this.showModal = false;
+        this.bookingResponse = res;
+        this.bookingError = null;
+        alert('تم إرسال طلب الحجز بنجاح!\n' + JSON.stringify(res, null, 2));
+      },
+      error: (err) => {
+        this.bookingError = err.error || err;
+        this.bookingResponse = null;
+        alert('حدث خطأ أثناء إرسال طلب الحجز:\n' + JSON.stringify(this.bookingError, null, 2));
+      }
+    });
   }
 
   closeWaitMessage() {

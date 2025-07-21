@@ -50,4 +50,15 @@ export class TripService {
   getTripById(id: string) {
     return this.http.get<any>(`${API_BASE_URL}/Trip/GetTripById/${id}`);
   }
+
+  bookRide(tripId: string, seatsBooked: number, totalPrice: number): Observable<any> {
+    return this.http.post<any>(
+      `${API_BASE_URL}/Booking/CreateBooking`,
+      {
+        tripId,
+        seatsBooked,
+        totalPrice
+      }
+    );
+  }
 } 

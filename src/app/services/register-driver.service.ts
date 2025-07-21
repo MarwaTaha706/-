@@ -8,7 +8,7 @@ import { BooleanResponse, StringResponse, RegisterDriverRequest } from '../model
 export class RegisterDriverService {
   constructor(private http: HttpClient) {}
 
-  registerDriver(payload: FormData): Observable<BooleanResponse> {
+  registerDriver(payload: any): Observable<BooleanResponse> {
     return this.http.post<BooleanResponse>(
       `${API_BASE_URL}/Account/RegisterDriver`,
       payload

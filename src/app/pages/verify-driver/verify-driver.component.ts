@@ -188,9 +188,9 @@ export class VerifyDriverComponent implements OnInit {
     driverFormData.append('VehicleDetailsCommand.Description', formValue.description || '');
     // VehicleImageUrls هنا تعني صور السيارة فقط
     (formValue.vehicleImages as File[]).forEach(file => driverFormData.append('VehicleDetailsCommand.VehicleImageUrls', file));
-    (formValue.licenseFile as File[]).forEach(file => driverFormData.append('VehicleDetailsCommand.DriverLicense', file));
-    (formValue.driverIdFile as File[]).forEach(file => driverFormData.append('VehicleDetailsCommand.Identity', file));
-    (formValue.carLicenseFile as File[]).forEach(file => driverFormData.append('VehicleDetailsCommand.VehicleRegistration', file));
+    (formValue.licenseFile as File[]).forEach(file => driverFormData.append('addVerificationDocuments.DriverLicense', file));
+    (formValue.driverIdFile as File[]).forEach(file => driverFormData.append('addVerificationDocuments.Identity', file));
+    (formValue.carLicenseFile as File[]).forEach(file => driverFormData.append('addVerificationDocuments.VehicleRegistration', file));
     // طباعة محتوى docsFormData
     // for (let pair of docsFormData.entries()) {
     //   console.log('DOCS:', pair[0], pair[1]);

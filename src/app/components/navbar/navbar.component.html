@@ -85,9 +85,9 @@
     </button>
 
 
-    <ng-container *ngIf="isLoggedInFn()">
+    <ng-container *ngIf="isLoggedInFn()" class="">
 
-      <div class="relative">
+      <div class="relative mr-2">
         <button (click)="toggleDropdown()" class="flex items-center gap-2 focus:outline-none p-1 rounded-full">
           <img [src]="profileImageUrl" alt="Profile"
             class="w-10 h-10 rounded-full object-cover border-2 border-transparent hover:border-primary-color transition-all">
