@@ -13,4 +13,32 @@
 .text-shadow-lg {
   text-shadow: 0 4px 32px rgba(0,0,0,0.35), 0 1.5px 0 #183A7C;
 }
-  
+  .image-container {
+  position: relative; /* Establishes a coordinate system for the absolute children */
+  width: 100%;       /* Takes up the full width of its parent */
+  max-width: 600px;  /* Optional: Prevents the layout from becoming too large on wide screens */
+  height: 500px;     /* The height you specified */
+  margin: auto;      /* Centers the container horizontally */
+}
+
+/* Styling for the phone image */
+.phone-image {
+  position: absolute;
+  bottom: 0;
+  left: 40%; /* Position relative to the container */
+  transform: translateX(-50%); /* Center the image on the 'left' point */
+  width: 45%; /* Scales with the container's width */
+  height: auto; /* Maintains aspect ratio */
+  z-index: 10; /* Places it behind the car */
+}
+
+/* Styling for the car image */
+.car-image {
+  position: absolute;
+  bottom: 0;
+  left: 60%; /* Position relative to the container */
+  transform: translateX(-50%); /* Center the image on the 'left' point */
+  width: 60%; /* Make the car appear larger and in front */
+  height: auto; /* Maintains aspect ratio */
+  z-index: 20; /* Places it in front of the phone */
+}

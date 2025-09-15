@@ -1,0 +1,111 @@
+/*
+  هذا الملف مخصص لتعديل أنماط Bootstrap لتتناسب مع الهوية البصرية المطلوبة.
+*/
+
+/* 
+  تعديل لون خلفية الرابط النشط (.active) في الشريط الجانبي.
+  نستخدم خلفية شفافة وخطًا جانبيًا، تمامًا مثل تصميم Tailwind.
+*/
+.journey-logo-final {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.journey-logo-final:hover {
+  transform: scale(1.05);
+}
+
+/* إعداد مسار حركة السيارة */
+.journey-logo-final #car-final {
+  /* المسار الذي ستتبعه السيارة داخل الـ SVG */
+  offset-path: path("M 25,60 C 50,35 170,35 195,60");
+  /* تطبيق الأنيميشن */
+  animation: drive-final 4s ease-in-out infinite;
+}
+
+/* تعريف حركة السيارة (ذهابًا وإيابًا) */
+@keyframes drive-final {
+  0% {
+    offset-distance: 0%;
+    transform: rotate(0deg); /* الاتجاه الأصلي */
+  }
+  48% {
+    offset-distance: 100%;
+    transform: rotate(0deg); /* تصل للنهاية بنفس الاتجاه */
+  }
+  52% {
+    offset-distance: 100%;
+    transform: rotate(180deg); /* تستدير للعودة */
+  }
+  98% {
+    offset-distance: 0%;
+    transform: rotate(180deg); /* تصل للبداية بالاتجاه المعاكس */
+  }
+  100% {
+    offset-distance: 0%;
+    transform: rotate(0deg); /* تعود للوضع الأصلي استعدادًا للتكرار */
+  }
+}
+
+/* حركة النبض لأيقونات البداية والنهاية */
+.journey-logo-final #source-pin,
+.journey-logo-final #dest-pin {
+  animation: pulse 2s infinite ease-in-out;
+}
+
+/* تأخير نبض أيقونة النهاية لتبدو الحركة متناوبة وجذابة */
+.journey-logo-final #dest-pin {
+  animation-delay: 1s;
+}
+
+/* تعريف حركة النبض */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15); /* تكبير بسيط */
+    opacity: 0.8;
+  }
+}
+
+.nav-pills .nav-link.active, 
+.nav-pills .show > .nav-link {
+  background-color: #2B438B; /* bg-cyan-500/10 */
+  color: #0dd9fe; /* text-cyan-400 */
+  border-right: 4px solid #c1ece9; /* border-r-4 border-cyan-400 */
+}
+
+/* 
+  تعديل لون الروابط عند مرور الماوس فوقها.
+*/
+.nav-pills .nav-link:not(.active):hover {
+  background-color: #0ca195; /* درجة أغمق قليلاً من الخلفية */
+  color: #ffffff;
+}
+
+/*
+  تأثيرات انتقالية بسيطة لتحسين تجربة المستخدم.
+*/
+.nav-link, .btn {
+  transition: all 0.2s ease-in-out;
+}
+
+/*
+  تأثير ظهور تدريجي للمحتوى عند تحميله في <router-outlet>
+*/
+:host ::ng-deep router-outlet + * {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

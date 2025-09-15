@@ -1,33 +1,33 @@
+// In src/app/services/register-driver.service.ts
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../api';
-import { BooleanResponse, StringResponse, RegisterDriverRequest } from '../models/register.model';
+import { BooleanResponse } from '../models/register.model';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: 'root' } )
 export class RegisterDriverService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient ) {}
 
-  registerDriver(payload: any): Observable<BooleanResponse> {
+  /**
+   * This is now the ONLY method needed.
+   * It sends all driver and document information in a single request.
+   */
+  registerDriver(payload: FormData): Observable<BooleanResponse> {
     return this.http.post<BooleanResponse>(
       `${API_BASE_URL}/Account/RegisterDriver`,
       payload
-    );
+     );
   }
 
-  /**
-   * يجلب رابط صورة الملف الشخصي للمستخدم الحالي.
-   */
-  getCurrentUserProfileImageURL(): Observable<StringResponse> {
-    return this.http.get<StringResponse>(
-      `${API_BASE_URL}/GetCurrentUserProfileImageURL`
-    );
+  // The uploadDocuments method is no longer needed and can be removed.
+  /*
+  uploadDocuments(payload: FormData): Observable<BooleanResponse> {
+    return this.http.post<BooleanResponse>(
+      `${API_BASE_URL}/Account/UploadDocuments`,
+      payload
+     );
   }
-
-  // uploadDocuments(payload: FormData): Observable<BooleanResponse> {
-  //   return this.http.post<BooleanResponse>(
-  //     `${API_BASE_URL}/Account/UploadDocuments`,
-  //     payload
-  //   );
-  // }
+  */
 }

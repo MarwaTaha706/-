@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 
 import { TripSuggestionService } from '../../services/trip-suggestion.service';
 import { AuthService } from '../../services/auth.service';
+import { ProfileService } from '../../services/profile.service'; // 👈 1. IMPORT ProfileService
 
 import { TripSuggestion } from '../../models/trip-suggestion.model';
 
@@ -17,13 +18,14 @@ import { TripSuggestion } from '../../models/trip-suggestion.model';
 export class MySuggestedTripsComponent implements OnInit {
 
   myTrips: TripSuggestion[] = [];
-  
   isLoading = true;
   currentUsername: string | null = null;
+  userProfile: any = null; // 👈 2. ADD userProfile property
 
   constructor(
     private tripSuggestionService: TripSuggestionService,
     private authService: AuthService,
+    private profileService: ProfileService, // 👈 3. INJECT ProfileService
     private router: Router
   ) { }
 
@@ -31,93 +33,63 @@ export class MySuggestedTripsComponent implements OnInit {
     console.log('=== My Suggested Trips Component Initialized ===');
     
     const currentUser = this.authService.getCurrentUser();
-    console.log('Current user from token:', currentUser);
-    
-   
-    const isLoggedIn = this.authService.isLoggedIn();
-    console.log('Is user logged in:', isLoggedIn);
-  
-    const token = this.authService.getToken();
-    console.log('Token exists:', !!token);
-    if (token) {
-      console.log('Token preview:', token.substring(0, 50) + '...');
-    }
     
     if (currentUser?.name) {
       this.currentUsername = currentUser.name;
       console.log('Using username from token:', this.currentUsername);
       this.loadMyTrips();
+      this.loadUserProfile(); // 👈 4. CALL the new function to load profile data
     } else {
       this.isLoading = false;
-      console.error("لا يمكن جلب الرحلات لأن المستخدم غير معروف.");
-      console.error("Current user object:", currentUser);
-      console.error("Please make sure you are logged in first!");
+      console.error("Cannot fetch trips because the user is unknown.");
     }
   }
 
-  loadMyTrips(): void {
-    this.isLoading = true;
-    
-    console.log('Loading all trips and filtering by current user...');
+  // ✅ 5. ADD new function to load the user's profile
+  loadUserProfile(): void {
+    this.profileService.getPassengerProfile().subscribe({
+      next: (profileData) => {
+        this.userProfile = profileData.data;
+        console.log('User profile loaded:', this.userProfile);
+      },
+      error: (err) => {
+        console.error('Failed to load user profile:', err);
+      }
+    });
+  }
 
-   
+  loadMyTrips(): void {
+    // ... (this function remains unchanged)
+    this.isLoading = true;
     this.tripSuggestionService.getUserTripSuggestions('').subscribe({
       next: (response) => {
-        console.log('Full API Response:', response);
-        
-        
-        let allTrips: TripSuggestion[] = [];
-        
-        if (response?.data) {
-          allTrips = response.data;
-        } else if (Array.isArray(response)) {
-          allTrips = response;
-        } else if (response && typeof response === 'object') {
-     
-          allTrips = Array.isArray(response) ? response : [response];
-        }
-        
-        console.log('All trips from API:', allTrips);
-        console.log('Current username:', this.currentUsername);
-        
-        if (allTrips.length > 0) {
-          console.log('First trip structure:', allTrips[0]);
-          console.log('Available fields in trip:', Object.keys(allTrips[0]));
-        
-          console.log('All trips for debugging:');
-          allTrips.forEach((trip, index) => {
-            console.log(`Trip ${index + 1}:`, trip);
-          });
-        }
-        
-       
+        let allTrips: TripSuggestion[] = response?.data || (Array.isArray(response) ? response : []);
         this.myTrips = allTrips.filter((trip: any) => {
-          
-          const tripUsername = trip.userName || trip.username || trip.user_name || trip.user || trip.creator || trip.owner;
-          console.log('Checking trip:', trip);
-          console.log('Trip username field:', tripUsername);
-          console.log('Current username:', this.currentUsername);
-          
-        
-          const match = tripUsername && this.currentUsername && 
-                       tripUsername.toLowerCase() === this.currentUsername.toLowerCase();
-          console.log('Match (case-insensitive):', match);
-          return match;
+          const tripUsername = trip.userName || trip.username;
+          return tripUsername && this.currentUsername && 
+                 tripUsername.toLowerCase() === this.currentUsername.toLowerCase();
         });
-        
-        console.log('Filtered trips for current user:', this.myTrips);
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('فشل جلب رحلاتي المقترحة:', err);
-        console.error('Error details:', err);
+        console.error('Failed to fetch my suggested trips:', err);
         this.myTrips = [];
         this.isLoading = false;
       }
     });
   }
 
+  public getStreetAddress(fullAddress: string, city: string, country: string): string {
+    // ... (this function remains unchanged)
+    if (!fullAddress) return 'لا يوجد عنوان محدد';
+    let street = fullAddress.replace(city, '').replace(country, '').replace(/[0-9]/g, '').replace(/, ,/g, ',').replace(/ ,/g, ',').trim();
+    if (street.startsWith(',')) street = street.substring(1).trim();
+    if (street.endsWith(',')) street = street.slice(0, -1).trim();
+    return street || city;
+  }
+
   deleteTrip(trip: TripSuggestion): void {
+    // ... (this function remains unchanged)
     if (!trip.id) {
       alert('لا يمكن حذف الرحلة: لا يوجد معرف (ID) صالح.');
       return;
@@ -137,17 +109,16 @@ export class MySuggestedTripsComponent implements OnInit {
   }
 
   editTrip(trip: TripSuggestion): void {
+    // ... (this function remains unchanged)
     if (!trip.id) {
       alert('لا يمكن تعديل الرحلة: لا يوجد معرف (ID) صالح.');
       return;
     }
-    console.log('Edit button clicked for trip:', trip);
-    console.log(`Navigating to edit page for trip ID: ${trip.id}`);
     this.router.navigate(['/suggest-trip', trip.id]);
   }
 
-
   createNewSuggestion(): void {
+    // ... (this function remains unchanged)
     this.router.navigate(['/suggest-trip']);
   }
 }

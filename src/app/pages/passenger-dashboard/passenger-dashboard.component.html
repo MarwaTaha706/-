@@ -1,148 +1,160 @@
+
 <div class="w-full h-[450px] rounded-lg overflow-hidden mt-13">
   <div id="map" class="relative w-full h-full"></div>
   <div class="absolute top-40 right-10 gap-4 z-999 flex flex-col">
-    <button (click)="setSelectionMode(true)"
-      [ngClass]="{'bg-blue-700 text-white': isSelectingPickup, 'bg-white': !isSelectingPickup}"
-      class="border border-blue-500 text-blue-500 rounded-full p-2 font-semibold hover:bg-blue-50 transition shadow-md">
+    <button (click)="setSelectionMode(true)" [ngClass]="{'bg-blue-700 text-white': isSelectingPickup, 'bg-white': !isSelectingPickup}" class="border border-blue-500 text-blue-500 rounded-full p-2 font-semibold hover:bg-blue transition shadow-md transition-transform duration-200 ease-in-out hover:scale-105">
       اختر نقطة الانطلاق
     </button>
-    <button (click)="setSelectionMode(false)"
-      [ngClass]="{'bg-blue-700 text-white': !isSelectingPickup, 'bg-white': isSelectingPickup}"
-      class="border border-blue-500 text-blue-500 rounded-full p-2 font-semibold hover:bg-blue-50 transition shadow-md">
+    <button (click)="setSelectionMode(false)" [ngClass]="{'bg-blue-700 text-white': !isSelectingPickup, 'bg-white': isSelectingPickup}" class="border border-blue-500 text-blue-500 rounded-full p-2 font-semibold hover:bg-blue-50 transition shadow-md transition-transform duration-200 ease-in-out hover:scale-105">
       اختر نقطة الوصول
     </button>
-    <button (click)="getCurrentLocation()"
-      class="border border-cyan-400 text-cyan-500 bg-white rounded-full p-2 font-semibold flex items-center gap-1 hover:bg-cyan-50 transition shadow-md">
+    <button (click)="getCurrentLocation()" class="border border-cyan-400 text-cyan-500 bg-white rounded-full p-2 font-semibold flex items-center gap-1 hover:bg-cyan-50 transition shadow-md transition-transform duration-200 ease-in-out hover:scale-105">
       استخدم الموقع الحالي
     </button>
-    <button (click)="resetLocations()"
-      class="border border-yellow-400 text-yellow-500 bg-white rounded-full p-2 font-semibold hover:bg-yellow-50 transition shadow-md">
+    <button (click)="resetLocations()" class="border border-yellow-400 text-yellow-500 bg-white rounded-full p-2 font-semibold hover:bg-yellow-50 transition shadow-md transition-transform duration-200 ease-in-out hover:scale-105">
       إعادة تعيين
     </button>
   </div>
 </div>
 
 
-<div class="w-full flex justify-center mb-10 sticky top-20 z-1000">
-  <div
-    class="flex flex-row items-center justify-between bg-white rounded-xl shadow border border-gray-400 overflow-hidden w-full max-w-5xl divide-x divide-gray-400 h-15">
-
-    <div class="relative w-1/5">
+<div class="w-full flex justify-center mb-20 mt-3 sticky top-19 z-1000">
+  <div class="flex flex-row items-center justify-between bg-white rounded-xl shadow border border-gray-400 overflow-hidden w-full max-w-6xl divide-x divide-gray-400 h-15">
+   
+    <div class="relative w-1/6">
       <img src="add_location_alt.png" alt="" class="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5">
-      <input type="text" placeholder="من" class="w-full py-2 pr-8 pl-6 rounded focus:outline-none text-gray-700"
-        [(ngModel)]="fromLocationText" (input)="onInputChange('from', $event)" />
+      <input type="text" placeholder="من" class="w-full py-2 pr-8 pl-6 rounded focus:outline-none text-gray-700" [(ngModel)]="fromLocationText" (input)="onInputChange('from', $event)" />
     </div>
-
-    <div class="relative w-1/5">
+   
+    <div class="relative w-1/6">
       <img src="distance.png" alt="" class="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5">
-      <input type="text" placeholder="الى" class="w-full py-2 pr-8 pl-6 rounded focus:outline-none text-gray-700"
-        [(ngModel)]="toLocationText" (input)="onInputChange('to', $event)" />
+      <input type="text" placeholder="الى" class="w-full py-2 pr-8 pl-6 rounded focus:outline-none text-gray-700" [(ngModel)]="toLocationText" (input)="onInputChange('to', $event)" />
     </div>
-
-    <div class="relative w-1/5">
-      <select [(ngModel)]="filterGender" class="w-full py-2 px-4 rounded focus:outline-none text-gray-700">
-        <option value="">الكل</option>
-        <option value="ذكر">ذكر</option>
-        <option value="أنثى">أنثى</option>
+   
+    <div class="relative w-1/6">
+      <select [(ngModel)]="filterGender" (ngModelChange)="onSearchClick()" class="w-full py-2 px-4 rounded focus:outline-none text-gray-700">
+        <option value="">الجنس (الكل)</option>
+        <option value="0">ذكر</option>
+        <option value="1">أنثى</option>
+      </select>
+    </div>
+  
+    <div class="relative w-1/6">
+      <select [(ngModel)]="filterStatus" (ngModelChange)="onSearchClick()" class="w-full py-2 px-4 rounded focus:outline-none text-gray-700">
+        <option value="">الحالة (الكل)</option>
+        <option value="1">مجدولة</option>
+        <option value="2">جارية</option>
+        <option value="3">مكتملة</option>
+        <option value="4">ملغاة</option>
       </select>
     </div>
 
-    <div class="relative w-1/5">
-      <input type="date" placeholder="اليوم"
-        class="w-full py-2 px-4 rounded focus:outline-none text-gray-700"
-        [(ngModel)]="filterDate" (change)="applyFilters()" />
+    <div class="relative w-1/6">
+      <input type="date" placeholder="اليوم" class="w-full py-2 px-4 rounded focus:outline-none text-gray-700" [(ngModel)]="filterDate" (change)="onSearchClick()" />
     </div>
-    <!-- Passengers -->
-    <!-- <div class="relative w-1/5">
-      <img src="group_add.png" alt="زيادة" class="absolute left-4 top-1/2 -translate-y-1/2 w-7 h-7 cursor-pointer"
-        (click)="increasePassengers()">
-      <img src="group_remove.png" alt="نقص" class="absolute left-14 top-1/2 -translate-y-1/2 w-7 h-7 cursor-pointer"
-        (click)="decreasePassengers()">
-      <span class="text-gray-700 pr-4">{{ passengerCount }} راكب</span>
-    </div> -->
-    <!-- Search Button -->
-    <button (click)="onSearchClick()" class="bg-blue-800 text-white font-bold px-8 py-3 h-full w-1/5">بحث</button>
+ 
+    <button (click)="onSearchClick()" class="bg-[#364E99] text-white font-bold px-8 py-3 h-full w-1/6">بحث</button>
   </div>
 </div>
-
-
-<div class="text-center my-12 p-6 bg-gray-50 rounded-xl shadow-md">
-  <h2 class="text-2xl font-bold text-green-700 mb-3">
-    اختر من الرحلات المتاحة
-  </h2>
-  <p class="text-gray-600 mb-6">
-    أو قم باقتراح رحلتك الخاصة وسيقوم السائقون بالتواصل معك
+<div class="welcome-container">
+  <p class="welcome-subtitle">
+   اكتشف، قارن، واحجز رحلتك المثالية بسهولة وأمان...✨✨
   </p>
-
-  <button (click)="navigateToSuggestTrip()" class="suggest-trip-button">
-    اقترح رحلتك الآن
-  </button>
 </div>
 
 
-<div class="flex flex-row flex-wrap justify-center gap-6">
-  <div *ngFor="let ride of filteredRides"
-    class="bg-white rounded-2xl shadow-2xl hover:shadow-4xl p-2 w-full max-w-xl flex flex-col items-center justify-between text-right divide-y divide-gray-400 cursor-pointer"
-    (click)="navigateToTripDetails(ride.tripId)">
-    <div class="flex items-center justify-center w-full">
-      <div class="px-4 flex flex-col gap-2 items-center w-1/3 pb-2">
-        <img [src]="getFullImageUrl(ride.driverImageUrl)" alt="صورة السائق"
-                class="w-16 h-16 rounded-full border-2 border-gray-300 mb-2">
-        <span class="font-bold text-gray-800 whitespace-nowrap">{{ ride.driverName }} ({{ride.driverGender}})</span>
-        <div class="flex items-center justify-center gap-1">
-          <span class="text-white font-semibold flex items-center justify-center gap-1 bg-yellow-500 rounded-md w-15">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.045 9.394c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" />
-            </svg>
-            {{ ride.rate }}
-          </span>
-          <span class="text-gray-500">{{ ride.carType }}</span>
+<div *ngIf="isLoading" class="flex justify-center items-center my-12">
+    <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600"></div>
+</div>
+
+
+<div *ngIf="!isLoading">
+  <div *ngIf="filteredRides.length > 0; else noTripsMessage" class="carousel-container bottom-4">
+    
+    <button (click)="scrollCards('prev')" class="carousel-arrow prev"><i class="bi bi-chevron-right"></i></button>
+
+    <div class="trip-cards-container" #tripCardsContainer>
+      <div *ngFor="let ride of filteredRides" class="trip-card">
+        
+       
+        <div class="trip-status-badge" [ngClass]="{ 'status-scheduled': ride.tripStatus === 1, 'status-ongoing': ride.tripStatus === 2, 'status-completed': ride.tripStatus === 3, 'status-cancelled': ride.tripStatus === 4 }">
+          {{ ride.tripStatus === 1 ? 'مجدولة' : (ride.tripStatus === 2 ? 'جارية' : (ride.tripStatus === 3 ? 'مكتملة' : (ride.tripStatus === 4 ? 'ملغاة' : 'غير معروفة'))) }}
+        </div>
+
+        <div class="card-header">
+          <span>احجز رحلتك مع</span>
+        </div>
+
+      
+        <div class="card-driver-section">
+          <img [src]="getFullImageUrl(ride.driverImageUrl)" alt="صورة السائق" class="driver-image">
+          <div class="driver-details">
+            <span class="driver-name">{{ ride.driverName }}</span>
+            <div class="driver-rating">
+              <i class="bi bi-star-fill star-icon"></i>
+              <span>{{ ride.rate | number:'1.1-1' }}</span>
+            </div>
+          </div>
+        </div>
+
+      
+        <div class="card-route-section">
+          <div class="route-point">
+            <span class="route-label">من</span>
+            <p class="route-city">{{ ride.departureCity }}</p>
+          </div>
+          <i class="bi bi-arrow-down route-arrow"></i>
+          <div class="route-point">
+            <span class="route-label">إلى</span>
+            <p class="route-city">{{ ride.destinationCity }}</p>
+          </div>
+        </div>
+
+     
+        <div class="card-details-section">
+          <div class="detail-item">
+            <span class="detail-value">{{ ride.price }} جنيه</span>
+            <span class="detail-label">سعر المقعد</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-value">{{ ride.availableSeats }}</span>
+            <span class="detail-label">مقاعد متاحة</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-value">{{ ride.departureTime | date:'shortTime' }}</span>
+            <span class="detail-label">{{ ride.departureTime | date:'MMM d' }}</span>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <button (click)="navigateToTripDetails(ride.tripId)" class="details-button">
+            المزيد من التفاصيل....
+          </button>
         </div>
       </div>
-      <img src="Group 113.png" alt="" class="py-6 h-32">
-      <div class="flex flex-col justify-between h-full py-6 px-2 w-2/3">
-        <div class="flex items-center gap-2 mb-2">
-          <img src="add_location_alt.png" alt="" class="w-5 h-5">
-          <span class="text-lg">{{ ride.departureCity }}</span>
-        </div>
-        <div class="flex items-center gap-2 mb-2">
-          <img src="distance.png" alt="" class="w-5 h-5">
-          <span class="text-lg">{{ ride.destinationCity }}</span>
-        </div>
-      </div>
-    </div>
-    <div class="flex items-center gap-2 mb-2">
-      <i class="fas fa-calendar-alt text-blue-500"></i>
-      <span class="text-lg">{{ ride.departureTime | date:'medium' }}</span>
     </div>
 
-    <div class="flex">
-      <div class="flex items-center gap-4 mt-2 divide-x divide-gray-400">
-        <span class="flex flex-col items-center pl-4">
-          <span class="font-semibold">نوع السيارة</span>
-          <span class="">{{ ride.carType }}</span>
-        </span>
-        <span class="flex flex-col items-center pl-4">
-          <span class="font-semibold">المقاعد المتاحة</span>
-          <span class="">{{ ride.availableSeats }}</span>
-        </span>
-        <div class="flex flex-col items-center">
-          <span class="font-semibold">سعر المقعد</span>
-          <span class="">{{ ride.price }} جنيه/مقعد</span>
-        </div>
-      </div>
-    </div>
+    <button (click)="scrollCards('next')" class="carousel-arrow next"><i class="bi bi-chevron-left"></i></button>
   </div>
+
+  <div class="pagination-dots" *ngIf="totalPages > 1">
+    <span *ngFor="let page of [].constructor(totalPages); let i = index" 
+          class="dot" 
+          [class.active]="pageNumber === (i + 1)"
+          (click)="goToPage(i + 1)">
+    </span>
+  </div>
+
+  <ng-template #noTripsMessage>
+    <div class="no-trips-container">
+      <div class="no-trips-message">
+        <i class="bi bi-compass no-trips-icon"></i>
+        <h3>لم يتم العثور على رحلات</h3>
+        <p>جرّب تغيير معايير البحث أو كن أول من يقترح رحلة!</p>
+        <button (click)="navigateToSuggestTrip()" class="suggest-trip-button">
+          <span>اقترح رحلتك الآن</span>
+        </button>
+      </div>
+    </div>
+  </ng-template>
 </div>
-<!-- Pagination Controls -->
-<div class="flex justify-center items-center pb-15 gap-2" *ngIf="totalPages > 1">
-  <button (click)="prevPage()" [disabled]="pageNumber === 1"
-    class="px-4 py-2 rounded bg-gray-300 text-gray-700 disabled:opacity-50">السابق</button>
-  <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
-    <button (click)="goToPage(i+1)" [class.bg-[#0BB097]]="pageNumber === (i+1)"
-      [class.text-white]="pageNumber === (i+1)" class="px-3 py-1 rounded mx-1"
-      [class.bg-gray-200]="pageNumber !== (i+1)">{{ i+1 }}</button>
-  </ng-container>
-  <button (click)="nextPage()" [disabled]="pageNumber === totalPages"
-    class="px-4 py-2 rounded bg-gray-300 text-gray-700 disabled:opacity-50">التالي</button>

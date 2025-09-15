@@ -1,249 +1,340 @@
-<div class="profile-container max-w-3xl mx-auto">
-  <!-- هيدر ملون مع صورة وظل -->
-  <div class="relative flex flex-col items-center justify-center bg-gradient-to-b from-blue-900 to-blue-800 rounded-t-2xl shadow-lg pb-16">
-    <div class="absolute top-4 right-4">
-      <button *ngIf="!editMode" (click)="isDriver ? openEditDriver() : openEditPassenger()" class="bg-white/80 hover:bg-white text-blue-600 font-bold py-2 px-4 rounded shadow transition">تعديل الملف الشخصي</button>
-      <button *ngIf="editMode" (click)="cancelEdit()" class="bg-red-100 hover:bg-red-200 text-red-600 font-bold py-2 px-4 rounded shadow transition">إلغاء</button>
+
+<div class="profile-page-container">
+
+  <div class="sidebar-nav sticky top-35">
+    <div class="sidebar-header">
+      <div class="profile-image-wrapper-small">
+        <img [src]="isDriver ? (driverProfile?.driverImageUrl || 'https://i.pravatar.cc/150' ) : (passengerProfile?.profileImageUrl || 'https://i.pravatar.cc/150' )" class="profile-image-small" alt="Profile Image">
+      </div>
+      <div class="user-details-small">
+        <h3 class="user-name-small">{{ (isDriver ? driverProfile?.name : passengerProfile?.name) || '...' }}</h3>
+        <span class="user-email-small">{{ (isDriver ? driverProfile?.email : passengerProfile?.email) || '...' }}</span>
+      </div>
     </div>
-    <div class="relative -mb-16 z-10 mt-4">
-      <img [src]="isDriver ? (driverProfile?.driverImageUrl || 'https://i.pravatar.cc/100') : (passengerProfile?.profileImageUrl || 'https://i.pravatar.cc/100')"
-        class="w-36 h-36 rounded-full border-4 border-white shadow-xl object-cover ring-4 ring-blue-200" alt="Profile">
-      <label *ngIf="!isDriver && editMode" class="absolute bottom-2 right-2 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow-lg border-2 border-white transition cursor-pointer" title="تغيير الصورة">
-        <i class="bi bi-camera"></i>
-        <input type="file" accept="image/*" (change)="onPassengerImageChange($event)" class="hidden" />
-      </label>
-      <label *ngIf="isDriver && editMode" class="absolute bottom-2 right-2 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow-lg border-2 border-white transition cursor-pointer" title="تغيير صورة السائق">
-        <i class="bi bi-camera"></i>
-        <input type="file" accept="image/*" (change)="onDriverImageChange($event)" class="hidden" />
-      </label>
-      <span *ngIf="isDriver" class="absolute bottom-2 left-2 bg-green-500 text-white text-xs px-3 py-1 rounded-full shadow">سائق موثق</span>
-      <span *ngIf="!isDriver" class="absolute bottom-2 left-2 bg-blue-500 text-white text-xs px-3 py-1 rounded-full shadow">راكب</span>
-    </div>
-    <div class="mt-20 text-center">
-      <h2 class="text-3xl font-extrabold text-white drop-shadow">{{ isDriver ? user?.name : passengerProfile?.name }}</h2>
-      <p class="text-blue-100 text-lg">{{ isDriver ? user?.email : passengerProfile?.email }}</p>
+    <ul class="nav-menu">
+      <li>
+        <button (click)="setView('personalInfo')" [class.active]="activeView === 'personalInfo'">
+          <i class="bi bi-person-vcard-fill"></i>
+          <span>المعلومات الشخصية</span>
+        </button>
+      </li>
+      <li>
+        <button (click)="setView('currentTrips')" [class.active]="activeView === 'currentTrips'">
+          <i class="bi bi-broadcast"></i>
+          <span>رحلاتي الحالية</span>
+        </button>
+      </li>
+      <li>
+        <button (click)="setView('pastTrips')" [class.active]="activeView === 'pastTrips'">
+          <i class="bi bi-clock-history"></i>
+          <span>رحلاتي السابقة</span>
+        </button>
+      </li>
+    </ul>
+    <div class="sidebar-footer">
+      <button (click)="isDriver ? openEditDriver() : openEditPassenger()" class="action-button edit-button-sidebar">
+        <i class="bi bi-pencil-fill"></i>
+        <span>تعديل الملف الشخصي</span>
+      </button>
     </div>
   </div>
 
-  <div class="-mt-10 space-y-8">
-    <!-- وضع التعديل -->
-    <form *ngIf="editMode" (ngSubmit)="isDriver ? saveDriverProfile() : savePassengerProfile()" class="card p-6 rounded-2xl bg-white/90 shadow-xl border border-blue-100 space-y-6">
-      <h3 class="text-xl font-bold text-blue-700 mb-4 flex items-center gap-2">
-        <i class="bi bi-pencil-square text-blue-500 bg-blue-100 p-2 rounded-full"></i> تعديل البيانات
+  <div class="main-content">
+
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="spinner"></div>
+    </div>
+
+    <div *ngIf="!isLoading && error" class="error-container">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <p>{{ error }}</p>
+    </div>
+
+    <ng-container *ngIf="!isLoading && !error">
+
+      <form *ngIf="editMode" (ngSubmit)="isDriver ? saveDriverProfile() : savePassengerProfile()" class="content-card animate-fade-in">
+        <div class="card-header">
+          <i class="bi bi-pencil-square"></i>
+          <h3 class="card-title-text">تعديل البيانات الشخصية</h3>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <ng-container *ngIf="!isDriver">
+              <div>
+                <label class="form-label">الاسم</label>
+                <input type="text" [(ngModel)]="editPassengerData.Name" name="passengerName" class="form-input" required />
+              </div>
+              <div>
+                <label class="form-label">رقم الهاتف</label>
+                <input type="tel" [(ngModel)]="editPassengerData.PhoneNumber" name="passengerPhoneNumber" class="form-input" required />
+              </div>
+            </ng-container>
+            <ng-container *ngIf="isDriver">
+              <div>
+                <label class="form-label">اسم السائق</label>
+                <input type="text" [(ngModel)]="editDriverData.driverName" name="driverName" class="form-input" required />
+              </div>
+              <div>
+                <label class="form-label">رقم الهاتف</label>
+                <input type="tel" [(ngModel)]="editDriverData.phoneNumber" name="driverPhoneNumber" class="form-input" required />
+              </div>
+              <div class="col-span-full">
+                <label class="form-label">الوصف</label>
+                <textarea [(ngModel)]="editDriverData.description" name="description" rows="3" class="form-input"></textarea>
+              </div>
+            </ng-container>
+            <div class="col-span-full">
+                <label class="form-label">الصورة الشخصية</label>
+                <input type="file" accept="image/*" (change)="isDriver ? onDriverImageChange($event) : onPassengerImageChange($event)" class="file-input" />
+            </div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" [disabled]="isSaving" class="form-button primary">
+            <span *ngIf="!isSaving"><i class="bi bi-check-circle-fill"></i> حفظ التغييرات</span>
+            <span *ngIf="isSaving"><i class="bi bi-arrow-repeat animate-spin"></i> جارٍ الحفظ...</span>
+          </button>
+          <button type="button" (click)="cancelEdit()" [disabled]="isSaving" class="form-button secondary">إلغاء</button>
+        </div>
+      </form>
+
+      <div *ngIf="!editMode">
+
+        <div *ngIf="activeView === 'personalInfo'" class="animate-fade-in">
+          <div class="flex flex-col gap-6">
+            <div class="content-card">
+              <div class="card-header"><i class="bi bi-person-vcard-fill"></i><h3 class="card-title-text">المعلومات الشخصية</h3></div>
+              <div class="card-body">
+                <div class="info-grid-new">
+                  <div class="info-row"><span class="info-label"><i class="bi bi-person"></i> الاسم</span><span class="info-value">{{ (isDriver ? driverProfile?.name : passengerProfile?.name) || 'غير محدد' }}</span></div>
+                  <div class="info-row"><span class="info-label"><i class="bi bi-telephone"></i> الهاتف</span><span class="info-value">{{ (isDriver ? driverProfile?.phoneNumber : passengerProfile?.phoneNumber) || 'غير محدد' }}</span></div>
+                  <div class="info-row col-span-full"><span class="info-label"><i class="bi bi-envelope"></i> الإيميل</span><span class="info-value">{{ (isDriver ? driverProfile?.email : passengerProfile?.email) || 'غير محدد' }}</span></div>
+                  <div class="info-row"><span class="info-label"><i class="bi bi-signpost-split"></i> إجمالي الرحلات</span><span class="info-value">{{ (isDriver ? driverProfile?.tripsNumber : passengerProfile?.totalTrips) || 0 }}</span></div>
+                  <div *ngIf="isDriver" class="info-row"><span class="info-label"><i class="bi bi-power"></i> الحالة</span><span class="info-value"><span class="status-badge" [class.active]="driverProfile?.isActive">{{ driverProfile?.isActive ? 'نشط' : 'غير نشط' }}</span></span></div>
+                  <div *ngIf="!isDriver" class="info-row"><span class="info-label"><i class="bi bi-shield-lock-fill"></i> الحالة</span><span class="info-value"><span class="status-badge active">نشط</span></span></div>
+                  <div class="info-row col-span-full"><span class="info-label"><i class="bi bi-star-half"></i> التقييم</span>
+                    <div class="info-value">
+                      <ng-container *ngIf="(isDriver ? driverProfile?.driverRating : passengerProfile?.passengerRating) as rating; else noRating">
+                        <div class="flex items-center gap-1">
+                          <i *ngFor="let star of [1,2,3,4,5]" class="bi text-lg" [ngClass]="star <= rating ? 'bi-star-fill text-yellow-400' : 'bi-star text-gray-300'"></i>
+                          <span class="text-sm text-gray-500 mr-2">({{ (isDriver ? driverProfile?.driverRateCount : passengerProfile?.ratingCount) || 0 }} تقييم)</span>
+                        </div>
+                      </ng-container>
+                      <ng-template #noRating><span class="text-sm text-gray-500">لا توجد تقييمات بعد</span></ng-template>
+                    </div>
+                  </div>
+                  <div *ngIf="isDriver && driverProfile?.description" class="info-row col-span-full"><span class="info-label"><i class="bi bi-chat-left-text"></i> الوصف</span><p class="info-value description-text">{{ driverProfile.description }}</p></div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="isDriver && driverVehicle" class="content-card">
+              <div class="card-header-action">
+                <div class="card-header"><i class="bi bi-car-front-fill"></i><h3 class="card-title-text">بيانات السيارة</h3></div>
+                <button class="action-button edit-button-small" (click)="openEditVehicle()"><i class="bi bi-pencil"></i> تعديل</button>
+              </div>
+              <div class="card-body">
+  <!-- Main container using Flexbox -->
+  <div class="flex flex-col md:flex-row items-start gap-6">
+
+   
+    <div class="w-full md:w-1/3 flex-shrink-0">
+      <img 
+        [src]="driverVehicle.imageURLs?.[0] || 'assets/images/placeholder-car.png'" 
+        alt="صورة المركبة" 
+        class="w-full h-auto object-cover rounded-lg shadow-md border border-gray-200"
+      >
+    </div>
+
+    <div class="w-full md:w-2/3">
+      <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">
+        تفاصيل المركبة
       </h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div *ngIf="!isDriver">
-          <label class="block mb-1 font-semibold">الاسم</label>
-          <input type="text" [(ngModel)]="editPassengerData.Name" name="passengerName" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" required />
+      <div class="info-grid-new">
+        <div class="info-row">
+          <span class="info-label">الموديل</span>
+          <span class="info-value">{{ driverVehicle.model || 'غير متوفر' }}</span>
         </div>
-        <div *ngIf="isDriver">
-          <label class="block mb-1 font-semibold">اسم السائق</label>
-          <input type="text" [(ngModel)]="editDriverData.driverName" name="driverName" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" required />
+        <div class="info-row">
+          <span class="info-label">اللون</span>
+          <span class="info-value">{{ driverVehicle.color || 'غير متوفر' }}</span>
         </div>
-        <!-- رقم الهاتف للراكب -->
-        <div *ngIf="!isDriver">
-          <label class="block mb-1 font-semibold">رقم الهاتف</label>
-          <input type="text" [(ngModel)]="editPassengerData.PhoneNumber" name="passengerPhoneNumber" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" required />
+        <div class="info-row">
+          <span class="info-label">رقم اللوحة</span>
+          <span class="info-value">{{ driverVehicle.plateNumber || 'غير متوفر' }}</span>
         </div>
-        <!-- رقم الهاتف للسائق -->
-        <div *ngIf="isDriver">
-          <label class="block mb-1 font-semibold">رقم الهاتف</label>
-          <input type="text" [(ngModel)]="editDriverData.phoneNumber" name="driverPhoneNumber" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" required />
-        </div>
-        <div *ngIf="isDriver">
-          <label class="block mb-1 font-semibold">الوصف</label>
-          <textarea [(ngModel)]="editDriverData.description" name="description" rows="2" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"></textarea>
+        <div class="info-row">
+          <span class="info-label">عدد المقاعد</span>
+          <span class="info-value">{{ driverVehicle.seatsNumber || 'غير متوفر' }}</span>
         </div>
       </div>
-      <div class="flex gap-4 mt-4">
-        <button type="submit" [disabled]="isSaving" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-full shadow transition flex-1 flex items-center justify-center gap-2">
-          <span *ngIf="!isSaving">حفظ</span>
-          <span *ngIf="isSaving" class="flex items-center gap-2"><i class="bi bi-arrow-repeat animate-spin"></i> جارٍ الحفظ...</span>
-        </button>
-        <button type="button" (click)="cancelEdit()" [disabled]="isSaving" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-8 rounded-full shadow transition flex-1">إلغاء</button>
-      </div>
-    </form>
+    </div>
 
-    <!-- عرض البيانات العادي -->
-    <div *ngIf="!editMode">
-      <div *ngIf="isDriver; else passengerProfileBlock">
-      <!-- بيانات السائق -->
-        <div class="card p-6 rounded-2xl bg-white/90 shadow-xl border border-blue-100">
-          <h3 class="text-xl font-bold text-blue-700 mb-4 flex items-center gap-2">
-            <i class="bi bi-person-badge text-blue-500 bg-blue-100 p-2 rounded-full"></i> بيانات السائق
-          </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div><span class="font-semibold">الاسم:</span> {{ driverProfile?.name || 'لا يوجد' }}</div>
-            <div><span class="font-semibold">الإيميل:</span> {{ driverProfile?.email || 'لا يوجد' }}</div>
-            <div><span class="font-semibold">رقم الهاتف:</span> {{ driverProfile?.phoneNumber || 'لا يوجد' }}</div>
-            <div><span class="font-semibold">عدد الرحلات:</span> {{ driverProfile?.tripsNumber != null ? driverProfile?.tripsNumber : 'لا يوجد' }}</div>
-            <div class="flex items-center gap-2">
-              <span class="font-semibold">التقييم:</span>
-              <ng-container *ngIf="driverProfile?.driverRating as rating">
-                <ng-container *ngFor="let star of [1,2,3,4,5]">
-                  <i class="bi" [ngClass]="star <= rating ? 'bi-star-fill text-yellow-400' : 'bi-star text-gray-300'"></i>
-                </ng-container>
-                <span class="text-xs text-gray-500">({{ driverProfile?.driverRateCount || 'لا يوجد'}} تقييم)</span>
-              </ng-container>
-            </div>
-            <div><span class="font-semibold">الحالة:</span> <span [ngClass]="driverProfile?.isActive ? 'text-green-600' : 'text-red-600'">{{ driverProfile?.isActive != null ? (driverProfile?.isActive ? 'نشط' : 'غير نشط') : 'لا يوجد' }}</span></div>
-            <div class="md:col-span-2"><span class="font-semibold">الوصف:</span> {{ driverProfile?.description || 'لا يوجد' }}</div>
-          </div>
-        </div>
+  </div>
 
-        <div class="card p-6 rounded-2xl bg-white/90 shadow-xl border border-blue-100">
-          <h3 class="text-xl font-bold text-blue-700 mb-4 flex items-center gap-2">
-            <i class="bi bi-car-front-fill text-blue-500 bg-blue-100 p-2 rounded-full"></i> رحلاتي كسائق
-          </h3>
-          <ul *ngIf="driverTrips && driverTrips.length; else noTrips" class="divide-y divide-gray-200">
-            <li *ngFor="let trip of driverTrips" class="p-4 flex flex-col gap-4">
-              <div class="flex items-center gap-4">
-                <div>
-                <i class="bi bi-geo-alt text-blue-400"></i>
-                <span class="font-semibold">من</span> {{ trip.departureAddress }}
-              </div>
-              <div>
-                <i class="bi bi-arrow-left-right mx-2 text-gray-400"></i>
-                <span class="font-semibold">إلى</span> {{ trip.destinationAddress }}
-              </div>
-              </div>
-              <div class="flex items-center gap-4 text-sm text-gray-500">
-                <div>
-                <i class="bi bi-calendar-event"></i> {{ trip.departureTime | date:'yyyy-MM-dd HH:mm' }}
-              </div>
-              <div>
-                <i class="bi bi-cash-coin"></i> {{ trip.price }} جنيه
-              </div>
-            </div>
-            </li>
-    </ul>
-          <ng-template #noTrips><div class="text-gray-400 text-center py-4">لا توجد رحلات.</div></ng-template>
-        </div>
-
-        <div class="card p-6 rounded-2xl bg-white/90 shadow-xl border border-blue-100">
-          <h3 class="text-xl font-bold text-blue-700 mb-4 flex items-center gap-2">
-            <i class="bi bi-file-earmark-text text-blue-500 bg-blue-100 p-2 rounded-full"></i> مستندات التوثيق
-          </h3>
-          <ul *ngIf="driverDocuments && driverDocuments.length; else noDocs" class="divide-y divide-gray-200">
-            <li *ngFor="let doc of driverDocuments" class="py-4">
-              <div class="flex items-center gap-2 mb-1">
-                <i class="bi bi-file-earmark-check text-green-500" *ngIf="doc.status === 1"></i>
-                <i class="bi bi-file-earmark-x text-red-500" *ngIf="doc.status !== 1"></i>
-                <span class="font-semibold">نوع المستند:</span> {{ doc.documentType }}
-              </div>
-              <div class="text-sm text-gray-600 mb-1"><span class="font-semibold">الحالة:</span> {{ doc.status === 1 ? 'موثق' : 'قيد المراجعة' }}</div>
-              <div class="text-sm text-gray-600 mb-1"><span class="font-semibold">تاريخ التوثيق:</span> {{ doc.verifiedAt | date:'yyyy-MM-dd' }}</div>
-              <div *ngIf="doc.documentURL && doc.documentURL.length" class="mb-1">
-                <span class="font-semibold">روابط المستند:</span>
-                <a *ngFor="let url of doc.documentURL" [href]="url" target="_blank" class="text-blue-600 underline mx-1">رابط</a>
-              </div>
-              <div *ngIf="doc.comment" class="text-xs text-gray-500">ملاحظة: {{ doc.comment }}</div>
-            </li>
-    </ul>
-          <ng-template #noDocs><div class="text-gray-400 text-center py-4">لا توجد مستندات توثيق.</div></ng-template>
-        </div>
-        <div class="card p-6 rounded-2xl bg-white/90 shadow-xl border border-blue-100" *ngIf="driverVehicle">
-          <div class="flex justify-between">
-          <h3 class="text-xl font-bold text-blue-700 mb-4 flex items-center gap-2">
-            <i class="bi bi-car-front-fill text-blue-500 bg-blue-100 p-2 rounded-full"></i> بيانات السيارة
-          </h3>
-          <button class="mt-6 bg-[#364E99] text-white px-4 h-10 rounded shadow hover:bg-blue-800 transition" (click)="openEditVehicle()">تعديل بيانات السيارة</button>
-        </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div><span class="font-semibold">الموديل:</span> {{ driverVehicle.model || 'لا يوجد' }}</div>
-            <div><span class="font-semibold">اللون:</span> {{ driverVehicle.color || 'لا يوجد' }}</div>
-            <div><span class="font-semibold">رقم اللوحة:</span> {{ driverVehicle.plateNumber || 'لا يوجد' }}</div>
-            <div><span class="font-semibold">عدد المقاعد:</span> {{ driverVehicle.seatsNumber || 'لا يوجد' }}</div>
-            <div class="md:col-span-2"><span class="font-semibold">الوصف:</span> {{ driverVehicle.description || 'لا يوجد' }}</div>
-            <div class="md:col-span-2 flex gap-2 mt-2" *ngIf="driverVehicle.imageURLs && driverVehicle.imageURLs.length">
-              <img *ngFor="let img of driverVehicle.imageURLs" [src]="img" class="w-20 h-20 rounded shadow border" alt="صورة السيارة">
-            </div>
-          </div>
-        </div>
-
-<!-- Modal لتعديل بيانات السيارة -->
-<div *ngIf="editVehicleMode" class="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center z-1000">
-  <div class="bg-white rounded-xl p-8 w-2xl shadow-lg relative h-[98vh]">
-    <button (click)="closeEditVehicle()" class="absolute top-2 left-2 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
-    <h3 class="text-lg font-bold mb-4 text-center">تعديل بيانات السيارة</h3>
-    <form (ngSubmit)="saveVehicleDetails()">
-      <div class="flex gap-2">
-      <div class="flex-1 mb-3">
-        <label class="block mb-1 font-semibold">الموديل</label>
-        <input type="text" [(ngModel)]="editVehicleData.Model" name="Model" class="w-full border rounded px-3 py-2" required />
-      </div>
-      <div class="flex-1 mb-3">
-        <label class="block mb-1 font-semibold">اللون</label>
-        <input type="text" [(ngModel)]="editVehicleData.Color" name="Color" class="w-full border rounded px-3 py-2" required />
-      </div>
-      </div>
-      <div class="flex gap-2">
-      <div class="mb-3">
-        <label class="block mb-1 font-semibold">رقم اللوحة</label>
-        <input type="text" [(ngModel)]="editVehicleData.PlateNumber" name="PlateNumber" class="w-full border rounded px-3 py-2" required />
-      </div>
-      <div class="mb-3">
-        <label class="block mb-1 font-semibold">عدد المقاعد</label>
-        <input type="number" [(ngModel)]="editVehicleData.SeatsNumber" name="SeatsNumber" class="w-full border rounded px-3 py-2" min="1" required />
-      </div>
-      </div>
-      <div class="mb-3">
-        <label class="block mb-1 font-semibold">الوصف</label>
-        <textarea [(ngModel)]="editVehicleData.Description" name="Description" class="w-full border rounded px-3 py-2" rows="2"></textarea>
-      </div>
-      <div class="mb-3">
-        <label class="block mb-1 font-semibold">صور السيارة</label>
-        <input type="file" (change)="onVehicleImagesChange($event)" multiple accept="image/*" class="w-full border rounded px-3 py-2" />
-        <div class="flex gap-2 mt-2 flex-wrap">
-          <img *ngFor="let img of editVehicleData.previews" [src]="img" class="w-16 h-16 rounded shadow border" alt="معاينة صورة">
-        </div>
-      </div>
-      <div class="flex gap-4 mt-6">
-        <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-8 rounded shadow flex-1">حفظ</button>
-        <button type="button" (click)="closeEditVehicle()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-8 rounded shadow flex-1">إلغاء</button>
-      </div>
-    </form>
+  <div *ngIf="driverVehicle.imageURLs && driverVehicle.imageURLs.length > 1" class="mt-6">
+    <h4 class="font-semibold text-gray-700 mb-3"><i class="bi bi-images"></i> صور إضافية</h4>
+    <div class="vehicle-images-container">
+     
+      <img 
+        *ngFor="let img of driverVehicle.imageURLs.slice(1)" 
+        [src]="img" 
+        class="vehicle-image" 
+        alt="صورة مركبة إضافية"
+      >
+    </div>
   </div>
 </div>
-      </div>
 
-      <ng-template #passengerProfileBlock>
-        <div class="card p-6 rounded-2xl bg-white/90 shadow-xl border border-blue-100">
-          <h3 class="text-xl font-bold text-blue-700 mb-4 flex items-center gap-2">
-            <i class="bi bi-person text-blue-500 bg-blue-100 p-2 rounded-full"></i> بيانات الراكب
-          </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div><span class="font-semibold">الاسم:</span> {{ passengerProfile?.name || 'لا يوجد' }}</div>
-            <div><span class="font-semibold">الإيميل:</span> {{ passengerProfile?.email || 'لا يوجد' }}</div>
-            <div><span class="font-semibold">رقم الهاتف:</span> {{ passengerProfile?.phoneNumber || 'لا يوجد' }}</div>
-            <div><span class="font-semibold">عدد الرحلات:</span> {{ passengerProfile?.totalTrips != null ? passengerProfile?.totalTrips : 'لا يوجد' }}</div>
-            <div class="flex items-center gap-2">
-              <span class="font-semibold">التقييم:</span>
-              <ng-container *ngIf="passengerProfile?.passengerRating as rating">
-                <ng-container *ngFor="let star of [1,2,3,4,5]">
-                  <i class="bi" [ngClass]="star <= rating ? 'bi-star-fill text-yellow-400' : 'bi-star text-gray-300'"></i>
-                </ng-container>
-                <span class="text-xs text-gray-500">({{ passengerProfile?.ratingCount }} تقييم)</span>
-              </ng-container>
             </div>
-            <div><span class="font-semibold">الحالة:</span> <span [ngClass]="passengerProfile?.isActive ? 'text-green-600' : 'text-red-600'">{{ passengerProfile?.isActive != null ? (passengerProfile?.isActive ? 'نشط' : 'غير نشط') : 'لا يوجد' }}</span></div>
+            <div *ngIf="isDriver" class="content-card">
+              <div class="card-header"><i class="bi bi-file-earmark-check-fill"></i><h3 class="card-title-text">مستندات التوثيق</h3></div>
+              <div class="card-body">
+                <ul *ngIf="driverDocuments?.length; else noDocs" class="list-container">
+                  <li *ngFor="let doc of driverDocuments" class="list-item-static">
+                    <div class="flex justify-between items-center">
+                      <span class="font-semibold">{{ doc.documentType }}</span>
+                      <span class="status-badge" [class.verified]="doc.status === 1" [class.pending]="doc.status !== 1">{{ doc.status === 1 ? 'موثق' : 'قيد المراجعة' }}</span>
+                    </div>
+                    <div *ngIf="doc.documentURLs?.length" class="mt-2"><a *ngFor="let url of doc.documentURLs" [href]="url" target="_blank" class="doc-link"><i class="bi bi-link-45deg"></i> عرض المستند</a></div>
+                  </li>
+                </ul>
+                <ng-template #noDocs><div class="empty-state"><i class="bi bi-file-earmark-excel"></i><p>لا توجد مستندات توثيق.</p></div></ng-template>
+              </div>
+            </div>
           </div>
-          <h3 class="text-xl font-bold text-blue-700 mb-4 flex items-center gap-2">
-            <i class="bi bi-person text-blue-500 bg-blue-100 p-2 rounded-full"></i> رحلاتي كراكب
-          </h3>
-          <ul class="divide-y divide-gray-200">
-            <li *ngFor="let trip of passengerTrips" class="py-4 flex flex-col md:flex-row md:items-center md:justify-between">
-              <div class="flex items-center gap-2">
-                <i class="bi bi-geo-alt text-blue-400"></i>
-                <span class="font-semibold">إلى</span> {{ trip.destination }}
-              </div>
-              <div class="text-sm text-gray-500 mt-1 md:mt-0">
-                <i class="bi bi-calendar-event"></i> {{ trip.date }}
-              </div>
-            </li>
-    </ul>
         </div>
-      </ng-template>
+
+        <!-- Current Trips View -->
+        <div *ngIf="activeView === 'currentTrips'" class="content-card animate-fade-in">
+          <div class="card-header"><i class="bi bi-broadcast" style="color: #16a34a;"></i><h3 class="card-title-text">رحلاتي الحالية</h3></div>
+          <div class="card-body">
+            <!-- Driver's Current Trips -->
+            <ul *ngIf="isDriver; else passengerCurrentTripsList" class="trips-list-container">
+              <ng-container *ngIf="driverCurrentTrips?.length; else noCurrentDriverTrips">
+                <li *ngFor="let trip of driverCurrentTrips" class="trip-item" (click)="goToTripDetails(trip.id)">
+                  <div class="trip-route"><div class="route-dot start"></div><div class="route-line"></div><div class="route-dot end"></div></div>
+                  <div class="trip-details">
+                    <div class="trip-status-badge" [ngClass]="{'status-scheduled': trip?.status === 1, 'status-ongoing': trip?.status === 2, 'status-completed': trip?.status === 3, 'status-cancelled': trip?.status === 4}">{{ trip?.status === 1 ? 'مجدولة' : (trip?.status === 2 ? 'جارية' : (trip?.status === 3 ? 'مكتملة' : (trip?.status === 4 ? 'ملغاة' : 'غير معروفة'))) }}</div>
+                    <p class="trip-location">{{trip.departureAddress}}</p>
+                    <p class="trip-location destination">{{trip.destinationAddress}}</p>
+                    <div class="trip-meta"><span><i class="bi bi-calendar3"></i> {{ trip.departureTime | date:'short' }}</span><span><i class="bi bi-cash-coin"></i> {{ trip.price }} جنيه</span></div>
+                  </div>
+                  <i class="bi bi-chevron-left trip-arrow"></i>
+                </li>
+              </ng-container>
+              <ng-template #noCurrentDriverTrips><div class="empty-state"><i class="bi bi-moon-stars"></i><p>لا توجد رحلات حالية.</p></div></ng-template>
+            </ul>
+            <!-- Passenger's Current Trips -->
+            <ng-template #passengerCurrentTripsList>
+              <ul class="trips-list-container">
+                <ng-container *ngIf="passengerCurrentTrips?.length; else noCurrentPassengerTrips">
+                  <li *ngFor="let trip of passengerCurrentTrips" class="trip-item" (click)="goToTripDetails(trip.id)">
+                    <div class="trip-route"><div class="route-dot start"></div><div class="route-line"></div><div class="route-dot end"></div></div>
+                    <div class="trip-details">
+                      <div class="trip-status-badge" [ngClass]="{'status-scheduled': trip?.status === 1, 'status-ongoing': trip?.status === 2, 'status-completed': trip?.status === 3, 'status-cancelled': trip?.status === 4}">{{ trip?.status === 1 ? 'مجدولة' : (trip?.status === 2 ? 'جارية' : (trip?.status === 3 ? 'مكتملة' : (trip?.status === 4 ? 'ملغاة' : 'غير معروفة'))) }}</div>
+                      <p class="trip-location">{{trip.departureAddress}}</p>
+                      <p class="trip-location destination">{{trip.destinationAddress}}</p>
+                      <div class="trip-meta"><span><i class="bi bi-calendar3"></i> {{ trip.departureTime | date:'short' }}</span><span><i class="bi bi-cash-coin"></i> {{ trip.price }} جنيه</span></div>
+                    </div>
+                    <i class="bi bi-chevron-left trip-arrow"></i>
+                  </li>
+                </ng-container>
+                <ng-template #noCurrentPassengerTrips><div class="empty-state"><i class="bi bi-moon-stars"></i><p>لا توجد رحلات حالية.</p></div></ng-template>
+              </ul>
+            </ng-template>
+          </div>
+        </div>
+
+      
+        <div *ngIf="activeView === 'pastTrips'" class="content-card animate-fade-in">
+          <div class="card-header"><i class="bi bi-clock-history"></i><h3 class="card-title-text">رحلاتي السابقة</h3></div>
+          <div class="card-body">
+           
+            <ul *ngIf="isDriver; else passengerPastTripsList" class="trips-list-container">
+              <ng-container *ngIf="driverTrips?.length; else noPastDriverTrips">
+                <li *ngFor="let trip of driverTrips" class="trip-item" (click)="goToTripDetails(trip.id)">
+                  <div class="trip-route"><div class="route-dot start"></div><div class="route-line"></div><div class="route-dot end"></div></div>
+                  <div class="trip-details">
+                    <div class="trip-status-badge" [ngClass]="{'status-scheduled': trip?.status === 1, 'status-ongoing': trip?.status === 2, 'status-completed': trip?.status === 3, 'status-cancelled': trip?.status === 4}">{{ trip?.status === 1 ? 'مجدولة' : (trip?.status === 2 ? 'جارية' : (trip?.status === 3 ? 'مكتملة' : (trip?.status === 4 ? 'ملغاة' : 'غير معروفة'))) }}</div>
+                    <p class="trip-location">{{trip.departureAddress}}</p>
+                    <p class="trip-location destination">{{trip.destinationAddress}}</p>
+                    <div class="trip-meta"><span><i class="bi bi-calendar3"></i> {{ trip.departureTime | date:'short' }}</span><span><i class="bi bi-cash-coin"></i> {{ trip.price }} جنيه</span></div>
+                  </div>
+                  <i class="bi bi-chevron-left trip-arrow"></i>
+                </li>
+              </ng-container>
+              <ng-template #noPastDriverTrips><div class="empty-state"><i class="bi bi-map"></i><p>لا توجد رحلات سابقة لعرضها.</p></div></ng-template>
+            </ul>
+            <!-- Passenger's Past Trips -->
+            <ng-template #passengerPastTripsList>
+              <ul class="trips-list-container">
+                <ng-container *ngIf="passengerTrips?.length; else noPastPassengerTrips">
+                  <li *ngFor="let trip of passengerTrips" class="trip-item" (click)="goToTripDetails(trip.id)">
+                    <div class="trip-route"><div class="route-dot start"></div><div class="route-line"></div><div class="route-dot end"></div></div>
+                    <div class="trip-details">
+                      <div class="trip-status-badge" [ngClass]="{'status-scheduled': trip?.status === 1, 'status-ongoing': trip?.status === 2, 'status-completed': trip?.status === 3, 'status-cancelled': trip?.status === 4}">{{ trip?.status === 1 ? 'مجدولة' : (trip?.status === 2 ? 'جارية' : (trip?.status === 3 ? 'مكتملة' : (trip?.status === 4 ? 'ملغاة' : 'غير معروفة'))) }}</div>
+                      <p class="trip-location">{{trip.departureAddress}}</p>
+                      <p class="trip-location destination">{{trip.destinationAddress}}</p>
+                      <div class="trip-meta"><span><i class="bi bi-calendar3"></i> {{ trip.departureTime | date:'short' }}</span></div>
+                    </div>
+                    <i class="bi bi-chevron-left trip-arrow"></i>
+                  </li>
+                </ng-container>
+                <ng-template #noPastPassengerTrips><div class="empty-state"><i class="bi bi-map"></i><p>لا توجد رحلات سابقة لعرضها.</p></div></ng-template>
+              </ul>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
+<div *ngIf="editVehicleMode" class="fixed inset-0 z-50 flex items-center justify-center p-4" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <div class="fixed inset-0 bg-black/60 transition-opacity" (click)="closeEditVehicle()"></div>
+  <div class="relative w-full max-w-2xl max-h-[90vh] bg-white rounded-2xl shadow-xl flex flex-col transform transition-all" (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between p-5 border-b rounded-t-2xl">
+      <h3 id="modal-title" class="text-xl font-semibold text-gray-800">تعديل بيانات السيارة</h3>
+      <button (click)="closeEditVehicle()" type="button" class="p-1.5 text-gray-400 bg-transparent rounded-lg hover:bg-gray-200 hover:text-gray-900">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+      </button>
+    </div>
+    <form (ngSubmit)="saveVehicleDetails()" class="flex-1 overflow-y-auto p-6 space-y-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div>
+          <label for="model" class="block mb-2 text-sm font-medium text-gray-900">الموديل</label>
+          <input id="model" type="text" [(ngModel)]="editVehicleData.Model" name="Model" class="form-input" required />
+        </div>
+        <div>
+          <label for="color" class="block mb-2 text-sm font-medium text-gray-900">اللون</label>
+          <input id="color" type="text" [(ngModel)]="editVehicleData.Color" name="Color" class="form-input" required />
+        </div>
+        <div>
+          <label for="plate" class="block mb-2 text-sm font-medium text-gray-900">رقم اللوحة</label>
+          <input id="plate" type="text" [(ngModel)]="editVehicleData.PlateNumber" name="PlateNumber" class="form-input" required />
+        </div>
+        <div>
+          <label for="seats" class="block mb-2 text-sm font-medium text-gray-900">عدد المقاعد</label>
+          <input id="seats" type="number" [(ngModel)]="editVehicleData.SeatsNumber" name="SeatsNumber" class="form-input" min="1" required />
+        </div>
+        <div class="sm:col-span-2">
+          <label for="description" class="block mb-2 text-sm font-medium text-gray-900">الوصف</label>
+          <textarea id="description" [(ngModel)]="editVehicleData.Description" name="Description" class="form-input" rows="3"></textarea>
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block mb-2 text-sm font-medium text-gray-900">صور السيارة</label>
+          <div class="flex flex-wrap gap-3 mb-4" *ngIf="editVehicleData.previews && editVehicleData.previews.length > 0">
+            <img *ngFor="let img of editVehicleData.previews" [src]="img" class="h-20 w-20 rounded-lg object-cover border" alt="معاينة صورة">
+          </div>
+          <input type="file" (change)="onVehicleImagesChange($event)" multiple accept="image/*" class="file-input" />
+        </div>
+      </div>
+    </form>
+    <div class="flex items-center justify-end p-5 space-x-2 border-t border-gray-200 rounded-b-2xl bg-gray-50">
+      <button (click)="closeEditVehicle()" type="button" class="px-5 py-2.5 text-sm font-medium text-gray-500 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-gray-900 focus:z-10 focus:ring-4 focus:ring-blue-300">إلغاء</button>
+      <button (click)="saveVehicleDetails()" [disabled]="isSaving" type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 disabled:opacity-50">
+        {{ isSaving ? 'جاري الحفظ...' : 'حفظ التغييرات' }}
+      </button>
     </div>
   </div>
 </div>

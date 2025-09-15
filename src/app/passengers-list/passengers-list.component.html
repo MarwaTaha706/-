@@ -1,0 +1,129 @@
+<div class="container-fluid p-lg-4">
+  <div class="card custom-card">
+    <div class="card-header custom-card-header">
+      <div class="d-flex align-items-center gap-3">
+        <i class="bi bi-people-fill fs-2 custom-header-icon"></i>
+        <div>
+          <h1 class="h4 mb-0 text-dark fw-bold">إدارة الركاب</h1>
+          <p class="mb-0 text-muted small">عرض وتصفح جميع الركاب المسجلين في النظام.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <!-- Toolbar (Search and Page Controls) -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <!-- Search Input with Debounced Live Search -->
+        <div class="input-group" style="max-width: 350px;">
+          <input 
+            type="text" 
+            class="form-control" 
+            placeholder="ابحث بالاسم أو البريد الإلكتروني..." 
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="searchSubject.next($event)"
+            aria-label="Search passengers">
+          <button class="btn btn-outline-secondary" type="button" (click)="onSearchClick()">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
+        
+        <!-- Page Size Control (Less relevant for client-side search but can be kept) -->
+        <div class="d-flex align-items-center gap-2">
+          <label for="pageSizeSelect" class="form-label mb-0 text-muted small">عرض:</label>
+          <select 
+            id="pageSizeSelect" 
+            class="form-select form-select-sm" 
+            style="width: auto;"
+            [(ngModel)]="pageSize"
+            (change)="onPageSizeChange()">
+            <option *ngFor="let size of availablePageSizes" [value]="size">{{ size }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Loading Indicator -->
+      <div *ngIf="isLoading" class="d-flex flex-column align-items-center justify-content-center text-center py-5">
+        <div class="spinner-border custom-spinner mb-3" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="text-muted">جاري تحميل الركاب...</p>
+      </div>
+
+      <!-- No Data / No Search Results Message -->
+      <div *ngIf="!isLoading && filteredPassengers.length === 0" class="text-center py-5">
+        <i class="bi bi-folder-x display-4 text-muted mb-3"></i>
+        <h5 class="card-title">لا توجد نتائج</h5>
+        <p class="card-text text-muted">
+          <!-- Show a specific message if the search query returned no results -->
+          <span *ngIf="searchQuery">لم يتم العثور على ركاب يطابقون بحثك.</span>
+          <!-- Show a generic message if there is no data at all -->
+          <span *ngIf="!searchQuery && allPassengers.length === 0">لم يتم العثور على أي ركاب لعرضهم حاليًا.</span>
+        </p>
+      </div>
+
+      <!-- Passengers Table -->
+      <div *ngIf="!isLoading && filteredPassengers.length > 0" class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr class="table-header-row">
+              <th scope="col" class="py-3 px-4">الاسم</th>
+              <th scope="col" class="py-3 px-4">البريد الإلكتروني</th>
+              <th scope="col" class="py-3 px-4">رقم الهاتف</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- *** IMPORTANT: The loop now iterates over 'filteredPassengers' *** -->
+            <tr *ngFor="let passenger of filteredPassengers">
+              <td class="px-4">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="avatar-circle">{{ passenger.name.charAt(0) }}</div>
+                  <span class="fw-medium">{{ passenger.name }}</span>
+                </div>
+              </td>
+              <td class="px-4 text-muted">{{ passenger.email }}</td>
+              <td class="px-4 text-muted" dir="ltr">{{ passenger.phoneNumber }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Card Footer: Pagination (Hidden because it's not accurate with client-side filtering) -->
+    <!-- 
+      NOTE: The pagination info from the server reflects the total number of records,
+      not the number of filtered records. It's best to hide this when using client-side search
+      to avoid confusing the user. If you still want to show it, you can remove the *ngIf.
+    -->
+    <div *ngIf="!searchQuery && paginationInfo && !isLoading && filteredPassengers.length > 0" class="card-footer custom-card-footer">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <!-- Pagination Info -->
+        <span class="text-muted small">
+          عرض {{ paginationInfo.count }} من أصل {{ paginationInfo.totalCount }}
+        </span>
+        
+        <!-- Page Navigation Buttons -->
+        <nav aria-label="Page navigation">
+          <ul class="pagination mb-0">
+            <li class="page-item" [class.disabled]="!paginationInfo.hasPreviousPage" (click)="prevPage()">
+              <a class="page-link" href="javascript:void(0)" aria-label="Previous">
+                <i class="bi bi-chevron-right"></i>
+              </a>
+            </li>
+            
+            <li class="page-item active" aria-current="page">
+              <span class="page-link">
+                {{ paginationInfo.pageNumber }}
+              </span>
+            </li>
+
+            <li class="page-item" [class.disabled]="!paginationInfo.hasNextPage" (click)="nextPage()">
+              <a class="page-link" href="javascript:void(0)" aria-label="Next">
+                <i class="bi bi-chevron-left"></i>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>

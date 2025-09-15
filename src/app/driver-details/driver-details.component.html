@@ -1,0 +1,119 @@
+<div class="container-fluid p-lg-4">
+  <!-- مؤشر التحميل -->
+  <div *ngIf="isLoading" class="d-flex flex-column align-items-center justify-content-center text-center py-5">
+    <div class="spinner-border custom-spinner mb-3" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="text-muted">جاري تحميل تفاصيل السائق...</p>
+  </div>
+
+  <!-- رسالة الخطأ -->
+  <div *ngIf="error && !isLoading" class="alert alert-danger d-flex align-items-center" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <div>
+      <strong>خطأ!</strong> {{ error }}
+    </div>
+  </div>
+
+  <!-- عرض التفاصيل عند اكتمال التحميل -->
+  <div *ngIf="(driverDetails$ | async) as details; else noData">
+    <!-- رأس الصفحة مع اسم السائق وزر التوثيق -->
+    <div class="page-header mb-4">
+      <div class="d-flex align-items-center gap-3">
+        <div class="avatar-circle-lg">{{ details.driverInfo.name.charAt(0) }}</div>
+        <div>
+          <h1 class="h4 mb-0 text-dark fw-bold">تفاصيل السائق: {{ details.driverInfo.name }}</h1>
+          <p class="mb-0 text-muted small">{{ details.driverInfo.email }}</p>
+        </div>
+      </div>
+      <!-- زر التوثيق -->
+      <div *ngIf="!details.driverInfo.isVerified">
+        <button (click)="verifyDriver(details.driverInfo.driverId)" class="btn btn-success d-flex align-items-center gap-2">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>توثيق السائق</span>
+        </button>
+      </div>
+      <div *ngIf="details.driverInfo.isVerified" class="alert alert-success-light mb-0 py-2 px-3">
+        <i class="bi bi-patch-check-fill me-1"></i>
+        <span>حساب موثق</span>
+      </div>
+    </div>
+
+    <!-- شبكة المعلومات الشخصية ومعلومات السيارة -->
+    <div class="row g-4 mb-4">
+      <!-- بطاقة المعلومات الشخصية -->
+      <div class="col-lg-6">
+        <div class="card custom-card h-100">
+          <div class="card-header">
+            <i class="bi bi-person-lines-fill me-2"></i>
+            المعلومات الشخصية
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item"><strong>رقم الهاتف:</strong> <span class="text-muted" dir="ltr">{{ details.driverInfo.phoneNumber }}</span></li>
+            <li class="list-group-item"><strong>الجنس:</strong> <span class="text-muted">{{ details.driverInfo.gender === 0 ? 'ذكر' : 'أنثى' }}</span></li>
+            <li class="list-group-item"><strong>تاريخ الإنشاء:</strong> <span class="text-muted">{{ details.driverInfo.createdAt | date:'fullDate' }}</span></li>
+          </ul>
+        </div>
+      </div>
+      <!-- بطاقة معلومات السيارة -->
+      <div class="col-lg-6">
+        <div class="card custom-card h-100">
+          <div class="card-header">
+            <i class="bi bi-car-front-fill me-2"></i>
+            معلومات السيارة
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item"><strong>الموديل:</strong> <span class="text-muted">{{ details.vehicleDetails.model }}</span></li>
+            <li class="list-group-item"><strong>اللون:</strong> <span class="text-muted">{{ details.vehicleDetails.color }}</span></li>
+            <li class="list-group-item"><strong>رقم اللوحة:</strong> <span class="text-muted">{{ details.vehicleDetails.plateNumber }}</span></li>
+            <li class="list-group-item"><strong>عدد المقاعد:</strong> <span class="text-muted">{{ details.vehicleDetails.seatsNumber }}</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- قسم المستندات -->
+    <div class="card custom-card">
+      <div class="card-header">
+        <i class="bi bi-file-earmark-check-fill me-2"></i>
+        المستندات المرفقة
+      </div>
+      <div class="card-body">
+        <div *ngIf="details.verificationDocument.length > 0; else noDocuments">
+          <div *ngFor="let doc of details.verificationDocument" class="document-item">
+            <div class="d-flex align-items-center gap-3">
+              <i class="bi bi-file-text-fill fs-2 text-primary"></i>
+              <div>
+                <p class="fw-bold mb-0">{{ doc.documentType }}</p>
+                <a [href]="doc.documentURLs[0]" target="_blank" class="small">عرض المستند</a>
+              </div>
+            </div>
+            <!-- حالة التوثيق للمستند -->
+            <div *ngIf="doc.status !== 1">
+              <button (click)="verifyDocument(doc.id)" class="btn btn-sm btn-outline-primary action-btn">
+                <i class="bi bi-check2-circle me-1"></i>
+                توثيق
+              </button>
+            </div>
+            <div *ngIf="doc.status === 1" class="badge bg-success-light text-success-dark">
+              <i class="bi bi-check-circle-fill me-1"></i>
+              موثق
+            </div>
+          </div>
+        </div>
+        <ng-template #noDocuments>
+          <p class="text-muted text-center py-3">لا توجد مستندات مرفقة لهذا السائق.</p>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+  <!-- رسالة في حالة عدم وجود بيانات -->
+  <ng-template #noData>
+    <div *ngIf="!isLoading && !error" class="text-center py-5">
+      <i class="bi bi-question-circle display-4 text-muted mb-3"></i>
+      <h5 class="card-title">لا توجد بيانات</h5>
+      <p class="card-text text-muted">لم يتم العثور على تفاصيل لهذا السائق.</p>
+    </div>
+  </ng-template>
+</div>

@@ -1,9 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
 import { ProfileService } from '../../services/profile.service';
 
 @Component({
@@ -11,130 +9,125 @@ import { ProfileService } from '../../services/profile.service';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.css',
+  styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent implements OnInit {
-  isDarkMode = false;
-  isLoggedIn = false;
-  isVerifiedDriver = false;
-  public isDropdownOpenState = false;
-  public user: { name: string; email: string; profileImageUrl: string } | null = null;
-  public profileImageUrl: string = 'https://i.pravatar.cc/40';
 
-  // اجعل authService public ليكون متاحًا في القالب
+  isDropdownOpen = false;
+  isDarkMode = false;
+  profileImageUrl: string = 'https://i.pravatar.cc/40';
+  user: { name: string; email: string; profileImageUrl: string } | null = null;
+
+ 
+  @ViewChild('dropdownMenu' ) dropdownMenuRef?: ElementRef;
+  @ViewChild('dropdownToggleButton') dropdownToggleButtonRef?: ElementRef;
+
+  // --- Constructor & Lifecycle Hooks ---
   constructor(
-    public authService: AuthService,
+    public authService: AuthService, // Public for template access
     private router: Router,
-    private cdr: ChangeDetectorRef,
-    private profileService: ProfileService
-  ) {
-    this.authService.getLoggedInObservable().subscribe(val => {
-      this.isLoggedIn = val;
-      this.cdr.markForCheck();
-      if (val && this.authService.isVerifiedDriver()) {
-        this.checkDriverVerifyStatus();
-        // جلب صورة السائق
-        this.profileService.getDriverProfile().subscribe(res => {
-          this.profileImageUrl = res.data?.driverImageUrl || 'https://i.pravatar.cc/40';
-          this.cdr.markForCheck();
-        });
-      } else if (val) {
-        // جلب صورة الراكب
-        this.profileService.getPassengerProfile().subscribe(res => {
-          this.profileImageUrl = res.data?.profileImageUrl || 'https://i.pravatar.cc/40';
-          this.cdr.markForCheck();
-        });
-      }
-    });
-    this.authService.getIsVerifiedDriverObservable().subscribe(val => {
-      this.isVerifiedDriver = val;
-      this.cdr.markForCheck();
-    });
-    this.authService.getCurrentUserObservable().subscribe(user => {
-      this.user = user;
-      this.cdr.markForCheck();
-    });
-  }
+    private profileService: ProfileService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
-    this.isLoggedIn = this.authService.isLoggedIn();
-    if (this.isLoggedIn && this.authService.isVerifiedDriver()) {
-      this.checkDriverVerifyStatus();
-    }
-    this.isVerifiedDriver = this.authService.isVerifiedDriver();
-  }
+    // Subscribe to user changes to update the local user object
+    this.authService.getCurrentUserObservable().subscribe(currentUser => {
+      this.user = currentUser;
+      this.cdr.markForCheck();
+    });
 
-  checkDriverVerifyStatus() {
-    this.authService.getDriverVerifyStatus().subscribe({
-      next: (res) => {
-        this.isVerifiedDriver = !!res.data;
-        this.cdr.markForCheck();
-      },
-      error: () => {
-        this.isVerifiedDriver = false;
-        this.cdr.markForCheck();
+    // Subscribe to login status to fetch profile image or reset it
+    this.authService.getLoggedInObservable().subscribe(isLoggedIn => {
+      if (isLoggedIn) {
+        this.fetchProfileImage();
+      } else {
+        this.profileImageUrl = 'https://i.pravatar.cc/40'; // Reset on logout
+        this.cdr.markForCheck( );
       }
     });
   }
 
-  // دالة حالة تسجيل الدخول
-  isLoggedInFn(): boolean {
-    return this.isLoggedIn;
-  }
+  // --- Click Outside Detection ---
+  @HostListener('document:click', ['$event.target'])
+  onClickOutside(target: HTMLElement): void {
+    // Do nothing if the dropdown is already closed
+    if (!this.isDropdownOpen) {
+      return;
+    }
 
-  // دالة حالة التوثيق
-  isVerifiedDriverFn(): boolean {
-    return this.isVerifiedDriver;
-  }
+    // Check if the click was on the toggle button
+    const clickedOnToggle = this.dropdownToggleButtonRef?.nativeElement.contains(target);
+    if (clickedOnToggle) {
+      return; // The toggle function will handle its own state
+    }
 
-  // دالة المستخدم الحالي (حقيقية من AuthService)
-  currentUser() {
-    return this.authService.getCurrentUser();
-  }
 
-  // القائمة المنسدلة
-  isDropdownOpen(): boolean {
-    return this.isDropdownOpenState;
-  }
-  toggleDropdown() {
-    this.isDropdownOpenState = !this.isDropdownOpenState;
-  }
-
-  // التنقل
-  navigateTo(path: string) {
-    this.router.navigate([path]);
-    this.isDropdownOpenState = false;
-  }
-
-  // تسجيل الخروج
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/auth']);
-    this.isDropdownOpenState = false;
-  }
-
-  toggleDarkMode() {
-    this.isDarkMode = !this.isDarkMode;
-    if (this.isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    const clickedInsideMenu = this.dropdownMenuRef?.nativeElement.contains(target);
+    if (!clickedInsideMenu) {
+      this.closeDropdown(); // Close the dropdown if the click was outside
     }
   }
 
-  goToLogin() {
+  // --- Dropdown and Navigation Methods ---
+  toggleDropdown(): void {
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
+
+  closeDropdown(): void {
+    this.isDropdownOpen = false;
+  }
+
+  navigateTo(path: string): void {
+    this.router.navigate([path]);
+    this.closeDropdown(); // Close dropdown after navigation
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/auth']);
+    this.closeDropdown(); // Ensure dropdown is closed
+  }
+
+  // --- Feature Methods ---
+  fetchProfileImage(): void {
+    const isDriver = this.authService.isVerifiedDriver();
+    const profileObs = isDriver 
+      ? this.profileService.getDriverProfile() 
+      : this.profileService.getPassengerProfile();
+
+    profileObs.subscribe({
+      next: (res) => {
+        this.profileImageUrl = res.data?.profileImageUrl || res.data?.driverImageUrl || 'https://i.pravatar.cc/40';
+        this.cdr.markForCheck( );
+      },
+      error: () => {
+        this.profileImageUrl = 'https://i.pravatar.cc/40'; // Fallback on error
+        this.cdr.markForCheck( );
+      }
+    });
+  }
+
+  toggleDarkMode(): void {
+    this.isDarkMode = !this.isDarkMode;
+    document.documentElement.classList.toggle('dark', this.isDarkMode);
+  }
+
+  goToLogin(): void {
     this.router.navigate(['/auth']);
   }
 
-  goToVerifyDriver() {
-    this.router.navigate(['/verify-driver']);
-  }
-
-  goToCreateTrip() {
-    if (this.isVerifiedDriver) {
+  goToCreateTrip(): void {
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/auth']);
+      return;
+    }
+    
+    if (this.authService.isVerifiedDriver()) {
       this.router.navigate(['/create-trip']);
     } else {
-      this.router.navigate(['/verify-driver']);
+      // Redirect to verification if not a driver
+      this.navigateTo('/verify-driver');
     }
   }
 }

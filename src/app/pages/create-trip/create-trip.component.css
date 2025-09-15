@@ -7,17 +7,7 @@
     font-family: 'Cairo', sans-serif;
 }
 
-/* Alternative Solution: If you prefer to target only the top card */
-/*
-.create-trip-container {
-    background-color: #f0f2f5;
-    min-height: 100vh;
-    padding: 2rem 1rem; // Keep original padding
-    font-family: 'Cairo', sans-serif;
-}
-*/
 
-/* Top Card (Header + Stepper) */
 .top-card {
     background: white;
     border-radius: 12px;
@@ -94,7 +84,8 @@
     color: #28a745;
 }
 .step.active .step-number-wrapper {
-    background-color: #0d1a4b;
+    background-color: #142b6e;
+    border: solid 1px #364E99;
     transform: scale(1.15);
     box-shadow: 0 5px 12px rgba(13, 26, 75, 0.3);
 }
@@ -113,7 +104,7 @@
     transition: background-color 0.4s ease;
 }
 .step-line.completed {
-    background-color: #28a745;
+    background-color: #0BB097;
 }
 
 /* --- Form Card Styling --- */
@@ -141,7 +132,7 @@
     align-items: center;
 }
 .step-title-main .fa-icon {
-    color: #0d6efd;
+    color: #364E99;
 }
 .step-description {
     color: #6c757d;
@@ -183,7 +174,7 @@
     color: #adb5bd;
 }
 .form-control:focus {
-    border-color: #0d6efd;
+    border-color: #1f2c6b;
     box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.2);
 }
 
@@ -221,12 +212,12 @@
 .map-controls button:hover {
     background-color: #f8f9fa;
     border-color: #0d6efd; /* Highlight border on hover */
-    color: #0d6efd;
+    color: #364E99;
     transform: translateY(-2px); /* Add a subtle lift effect */
 }
 
 .map-controls button.active {
-    background-color: #0d6efd;
+    background-color: #364E99;
     color: white;
     border-color: #0d6efd;
     box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2); /* Add a glow to the active button */
@@ -261,13 +252,13 @@
 .price-summary {
     background-color: #e9f7ef;
     border: 1px solid #a3e9a4;
-    border-left: 4px solid #28a745;
+    border-left: 4px solid #0BB097;
     border-radius: 8px;
     padding: 1rem;
     text-align: center;
 }
 .price-summary p {
-    color: #155724;
+    color: #a29cbe;
     font-size: 1.1rem;
 }
 
@@ -284,7 +275,7 @@
     margin-bottom: 1.5rem;
 }
 .review-title {
-    color: #0d6efd;
+    color: #364E99;
     font-weight: 600;
     margin-bottom: 1rem;
     display: flex;
@@ -319,7 +310,7 @@
     color: white;
     flex-shrink: 0;
 }
-.route-point.start .route-icon { background: #198754; }
+.route-point.start .route-icon { background: #0BB097; }
 .route-point.end .route-icon { background: #dc3545; }
 .route-details h6 { font-weight: 700; margin: 0; }
 .route-details p { margin: 0; color: #6c757d; }
@@ -357,10 +348,10 @@
     font-weight: 600;
     transition: all 0.3s ease;
 }
-.btn-primary { background-color: #0d6efd; border-color: #0d6efd; }
-.btn-primary:hover { background-color: #0b5ed7; border-color: #0a58ca; }
-.btn-success { background-color: #198754; border-color: #198754; }
-.btn-success:hover { background-color: #157347; border-color: #146c43; }
+.btn-primary { background-color: #364E99; border-color: #364E99; }
+.btn-primary:hover { background-color: #1b3583; border-color: #1b347e; }
+.btn-success { background-color: #0BB097; border-color: #198754; }
+.btn-success:hover { background-color: #078673; border-color: #146c43; }
 .btn-outline-secondary { border-color: #6c757d; color: #6c757d; }
 .btn-outline-secondary:hover { background: #6c757d; color: white; }
 
@@ -427,7 +418,7 @@
 .spinner-border {
     width: 2rem;
     height: 2rem;
-    color: #0d6efd;
+    color: #364E99;
 }
 @keyframes fadeInOverlay {
     from { opacity: 0; }
@@ -440,4 +431,82 @@
 @keyframes popInIcon {
     from { opacity: 0; transform: scale(0.5); }
     to { opacity: 1; transform: scale(1); }
+}
+/* --- Toggle Switch Styles --- */
+.toggle-switch-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #F8FAFC;
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    border: solid 1px  #dae6f7;
+    margin-top: 1rem;
+}
+.toggle-switch-label .form-label {
+    font-size: 1rem;
+    color:  #121A33;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+.toggle-switch-label .text-muted {
+    font-size: 0.875rem;
+    color:#64748B;
+}
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+    flex-shrink: 0;
+}
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.toggle-switch label {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: background-color 0.4s;
+    border-radius: 28px;
+}
+.toggle-switch label:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: transform 0.4s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle-switch input:checked + label {
+    background-color: #0BB097;
+}
+.toggle-switch input:focus + label {
+    box-shadow: 0 0 1px #0BB097;
+}
+.toggle-switch input:checked + label:before {
+    transform: translateX(22px);
+}
+
+/* --- Status Display (for Review Step) --- */
+.text-success {
+    color:  #16A34A;
+    font-weight: 700;
+}
+.text-danger {
+    color:  #DC2626;
+    font-weight: 700;
+}
+.review-card .fa-check-double {
+    color: #0BB097;
 }

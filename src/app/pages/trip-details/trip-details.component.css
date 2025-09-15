@@ -1,0 +1,248 @@
+/* Import Font Awesome for icons if you haven't already in your main styles.css or index.html */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css' );
+
+/* Base styles for the component host */
+:host {
+  display: block;
+  background-color: #f4f7fc; /* Light gray-blue background for the whole page */
+  font-family: 'Cairo', sans-serif; /* Ensuring consistent font */
+}
+
+/* General Card Styling */
+.card {
+  background-color: white;
+  border-radius: 1.25rem; /* 20px */
+  padding: 1.5rem; /* 24px */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease-in-out;
+}
+
+.card-title {
+  font-size: 1.25rem; /* 20px */
+  font-weight: 700;
+  color: #1f2937; /* Dark gray */
+  margin-bottom: 1.25rem; /* 20px */
+  padding-bottom: 0.75rem; /* 12px */
+  border-bottom: 1px solid #e5e7eb; /* Light gray border */
+}
+
+/* Detail Row Styling (for Car Details) */
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem; /* 12px */
+    border-radius: 0.5rem; /* 8px */
+    background-color: #f8f9fa; /* A very light gray */
+    transition: background-color 0.2s ease;
+  }
+  .detail-row:hover {
+    background-color: #f1f3f5;
+  }
+  .detail-row .label {
+    font-weight: 600; /* semibold */
+    color: #495057; /* gray-700 */
+  }
+  .detail-row .value {
+    font-weight: 500; /* medium */
+    color: #212529; /* gray-900 */
+  }
+
+/* List Item Styling (for Passengers/Bookings) */
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 0.75rem; /* 12px */
+  transition: background-color 0.2s ease-in-out;
+}
+.list-item:hover {
+  background-color: #f9fafb; /* Very light gray on hover */
+}
+
+/* General Button Styles */
+.action-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem; /* 14px 24px */
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+  border-radius: 0.75rem; /* 12px */
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.1);
+}
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.action-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  color: #374151; /* Dark gray text */
+  background-color: #f3f4f6; /* Light gray background */
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease-in-out;
+}
+.action-btn-secondary:hover {
+  background-color: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+.action-btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* Info Box Styling */
+.info-box {
+  text-align: center;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+}
+
+/* ✅ NEW: Tab Styles */
+.tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #6b7280; 
+  background-color: #f9fafb; 
+  border: none;
+  border-bottom: 3px solid transparent; 
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  top: 1px;
+}
+.tab-btn:hover {
+  color: #111827; 
+  background-color: #f3f4f6;
+}
+.tab-btn.active {
+  color: #364E99; 
+  background-color: white;
+  border-bottom-color: #364E99; 
+}
+.tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* Modal Styling */
+.modal-content {
+  background: white;
+  border-radius: 1.25rem; /* 20px */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+  overflow: hidden;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.modal-close-btn:hover {
+  color: #1f2937;
+}
+.modal-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #374151;
+}
+.modal-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.modal-input:focus {
+  outline: none;
+  border-color: #364E99;
+  box-shadow: 0 0 0 3px rgba(54, 78, 153, 0.2);
+}
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  background-color: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+}
+
+.star-3d {
+  font-size: 3.5rem;
+  line-height: 1;
+  color: #d1d5db; 
+  text-shadow: 
+    0px 2px 2px rgba(0, 0, 0, 0.3),
+    0px 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+.star-3d:hover {
+  transform: scale(1.2);
+  color: #fde047; 
+}
+.star-3d.toggled {
+  color: #facc15; 
+  transform: scale(1.1) translateY(-2px);
+  text-shadow: 
+    0px 1px 1px rgba(0, 0, 0, 0.4),
+    0px 2px 3px rgba(0, 0, 0, 0.2);
+}

@@ -11,16 +11,21 @@ export interface Trip {
 }
 
 export interface CreateTripRequest {
-  departureCity: string;
+ departureCity: string;
+  destinationCity: string;
+
   departureLatitude: number;
   departureLongitude: number;
-  destinationCity: string;
   destinationLatitude: number;
   destinationLongitude: number;
-  departureTime: string; // ISO string
+
+  departureTime: string;
   seatsAvailable: number;
   price: number;
-  notes: string;
+  
+  carId: string; // Assuming carId is a string
+  notes?: string; // Optional property
+  autoAcceptBooking: boolean;
 }
 
 export interface TripCard {
@@ -35,4 +40,5 @@ export interface TripCard {
   driverImageUrl: string;
   rate: number;
   driverGender: string;
+  tripStatus: number; 
 } 

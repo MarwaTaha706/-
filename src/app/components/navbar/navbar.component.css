@@ -24,18 +24,18 @@
 @keyframes drive-final {
   0% { offset-distance: 0%; transform: rotate(0deg); }
   48% { offset-distance: 100%; transform: rotate(0deg); }
-  52% { offset-distance: 100%; transform: rotate(180deg); } /* استدارة السيارة للعودة */
+  52% { offset-distance: 100%; transform: rotate(180deg); } 
   98% { offset-distance: 0%; transform: rotate(180deg); }
-  100% { offset-distance: 0%; transform: rotate(0deg); } /* العودة للوضع الطبيعي */
+  100% { offset-distance: 0%; transform: rotate(0deg); } 
 }
 
-/* حركة النبض لأيقونات البداية والنهاية */
+
 .journey-logo-final #source-pin,
 .journey-logo-final #dest-pin {
   animation: pulse 2s infinite ease-in-out;
 }
 
-/* تأخير نبض أيقونة النهاية لتبدو الحركة متناوبة */
+
 .journey-logo-final #dest-pin {
   animation-delay: 1s;
 }
@@ -46,7 +46,7 @@
     opacity: 1;
   }
   50% {
-    transform: scale(1.15); /* تكبير بسيط */
+    transform: scale(1.15); 
     opacity: 0.8;
   }
 }

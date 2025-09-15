@@ -1,117 +1,140 @@
-/* src/app/pages/suggest-trip/suggest-trip.component.css */
 
-/* --- أنماط جديدة ومعدلة --- */
-.map-wrapper {
-  position: relative;
-  margin-bottom: 20px;
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css' );
+
+
+:host {
+  display: block;
+  background-color: #f4f7fc;
+  font-family: 'Cairo', sans-serif;
 }
 
-.map-controls {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 1000; /* للتأكد من أنها فوق الخريطة */
-  display: flex;
-  gap: 10px;
-}
-
-.map-control-button {
+.card {
   background-color: white;
-  color: #333;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 8px 12px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  transition: all 0.2s;
+  border-radius: 1.25rem; 
+  padding: 1.5rem; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.map-control-button:hover {
-  background-color: #f4f4f4;
-  border-color: #aaa;
-}
-
-.map-control-button.reset {
-  background-color: #fbecec;
-  color: #c53030;
-  border-color: #f5c6cb;
-}
-.map-control-button.reset:hover {
-  background-color: #f8d7da;
-}
-
-.map-select-button.active {
-  background-color: #3182ce;
-  color: white;
-  border-color: #2c5282;
-}
-
-/* --- أنماط موجودة --- */
-.map-container {
-  height: 250px; /* تم تقليل الارتفاع قليلاً */
-  width: 100%;
-  border-radius: 8px;
-  border: 1px solid #cbd5e0;
-  box-shadow:#22537a 2px 2px 3px 2px;
-  border: #59b3e7 solid 2px;
-}
-
-.input-with-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.map-select-button {
-  padding: 12px 15px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  background-color: #edf2f7;
-  color: #4a5568;
-  border: 1px solid #cbd5e0;
-  border-radius: 8px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-}
-
-.map-select-button:hover {
-  background-color: #e2e8f0;
-}
-.popup-title {
-  font-size: 1.5rem;
+.card-title {
+  font-size: 1.25rem; 
   font-weight: 700;
-  color: #2d3748;
+  color: #1f2937; 
+  margin-bottom: 1.25rem; 
+  padding-bottom: 0.75rem; 
+  border-bottom: 1px solid #e5e7eb; 
+}
+
+
+.form-group label {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
 }
 
-/* نمط جديد لأيقونة الـ SVG */
-.gps-icon {
-  width: 28px;  /* تحديد عرض الأيقونة */
-  height: 28px; /* تحديد ارتفاع الأيقونة */
-  color: #3182ce; /* تحديد لون الأيقونة */
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem; 
+  font-size: 1rem;
+  background-color: #f9fafb;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* ... (بقية الأنماط تبقى كما هي) ... */
-.suggest-trip-popup { direction: rtl; }
-.popup-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 25px; border-bottom: 1px solid #dee2e6; }
-/* .popup-title { font-size: 1.5rem; font-weight: 700; color: #2d3748; } */
-.popup-close-button { background: none; border: none; font-size: 2.5rem; font-weight: 300; color: #a0aec0; cursor: pointer; line-height: 1; transition: color 0.2s; }
-.popup-close-button:hover { color: #4a5568; }
-.popup-body { padding: 25px; }
-.form-row { display: flex; gap: 20px; margin-bottom: 20px; }
-.form-group { flex: 1; display: flex; flex-direction: column; }
-.form-group label { font-weight: 600; color: #4a5568; margin-bottom: 8px; font-size: 0.9rem; }
-.form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 1rem; transition: border-color 0.3s, box-shadow 0.3s; }
-.form-group input:focus, .form-group textarea:focus { outline: none; border-color: #4299e1; box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5); }
-.popup-footer { display: flex; justify-content: flex-end; gap: 15px; padding: 20px 25px; border-top: 1px solid #e2e8f0; background-color: #f7fafc; }
-.submit-button, .cancel-button { font-size: 1rem; font-weight: 600; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s; }
-.submit-button { background-color:  #0BB097; color: white; }
-.submit-button:hover:not(:disabled) { background-color:  #56befa; }
-.submit-button:disabled { background-color: #a0aec0; cursor: not-allowed; }
-.cancel-button { background-color: #e2e8f0; color: #2d3748; }
-.cancel-button:hover { background-color: #cbd5e0; }
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #364E99;
+  box-shadow: 0 0 0 3px rgba(54, 78, 153, 0.2);
+  background-color: white;
+}
+
+.action-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+  border-radius: 0.75rem; 
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.action-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.1);
+}
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.action-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  color: #374151;
+  background-color: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease-in-out;
+}
+.action-btn-secondary:hover {
+  background-color: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+
+.control-btn, .control-btn-sm {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  border: 1px solid #d1d5db;
+  background-color: #f9fafb;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.control-btn:hover, .control-btn-sm:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.control-btn.active {
+  background-color: #364E99;
+  color: white;
+  border-color: #364E99;
+}
+
+.control-btn-sm {
+  padding: 0.6rem;
+  font-size: 0.875rem;
+}
+
+.control-btn-sm.reset {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+.control-btn-sm.reset:hover {
+  background-color: #fca5a5;
+  color: #7f1d1d;
+}

@@ -1,203 +1,210 @@
+<!-- Main container for the new layout -->
 <div class="create-trip-container">
-  <!-- Optional: Add a spacer div for navbar spacing -->
-  <div class="navbar-spacer"></div>
-  
-  <!-- Success Overlay -->
-  <div class="success-overlay" *ngIf="isSuccess()">
-      <div class="success-content">
-          <div class="success-icon-wrapper">
-              <div class="success-icon">
-                  <i class="fas fa-check"></i>
-              </div>
-          </div>
-          <h2 class="success-title">تم إنشاء الرحلة بنجاح!</h2>
-          <p class="success-text">سيتم توجيهك إلى صفحة رحلاتك خلال ثوانٍ...</p>
-          <div class="spinner-border text-primary mt-3" role="status">
-              <span class="visually-hidden">Loading...</span>
-          </div>
-      </div>
+ 
+    <div class="navbar-spacer"></div>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="top-card mb-4">
+                        <div class="hero-content text-center">
+                            <h1 class="hero-title">إنشاء رحلة جديدة</h1>
+                            <p class="hero-subtitle">شارك رحلتك مع الآخرين واحصل على دخل إضافي</p>
+                        </div>
+                        <div class="steps-container mt-4">
+                            <div class="steps-wrapper">
+                                <div class="step" [class.active]="currentStep() >= 1" [class.completed]="currentStep() >= 1">
+                                    <div class="step-number-wrapper">
+                                        <div class="step-number">1</div>
+                                    </div>
+                                    <div class="step-title">تفاصيل الرحلة</div>
+                                </div>
+                                <div class="step-line" [class.completed]="currentStep() > 1"></div>
+                                <div class="step" [class.active]="currentStep() >= 2" [class.completed]="currentStep() > 2">
+                                     <div class="step-number-wrapper">
+                                        <div class="step-number">2</div>
+                                    </div>
+                                    <div class="step-title">التوقيت والسعر</div>
+                                </div>
+                                <div class="step-line" [class.completed]="currentStep() > 2"></div>
+                                <div class="step" [class.active]="currentStep() >= 3">
+                                     <div class="step-number-wrapper">
+                                        <div class="step-number">3</div>
+                                    </div>
+                                    <div class="step-title">المراجعة</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                   
+                    <div class="form-card" *ngIf="tripForm">
+                        <div class="card-header">
+                            <h1 class="step-title-main mb-0">
+                                <fa-icon [icon]="icons.edit" class="me-2"></fa-icon>
+                                {{ getStepTitle() }}
+                            </h1>
+                            <p class="step-description mb-0">الخطوة {{ currentStep() }} من {{ totalSteps }}</p>
+                        </div>
+
+                        <div class="card-body">
+                            <form [formGroup]="tripForm" (ngSubmit)="onSubmit()">
+                           
+                               <div *ngIf="currentStep() === 1" class="step-content">
+                                <div class="map-controls">
+                                    <button type="button" (click)="setSelectionMode(true)" [ngClass]="{'active': isSelectingPickup}">
+                                        <fa-icon [icon]="icons.start" class="me-1"></fa-icon> اختر نقطة الانطلاق
+                                    </button>
+                                    <button type="button" (click)="setSelectionMode(false)" [ngClass]="{'active': !isSelectingPickup}">
+                                        <fa-icon [icon]="icons.end" class="me-1"></fa-icon> اختر نقطة الوصول
+                                    </button>
+                                    <button type="button" (click)="getCurrentLocation()">
+                                        <fa-icon [icon]="icons.gps" class="me-1"></fa-icon> استخدم موقعي
+                                    </button>
+                                    <button type="button" (click)="resetLocations()">
+                                        <fa-icon [icon]="icons.reset" class="me-1"></fa-icon> إعادة تعيين
+                                    </button>
+                                </div>
+                                <div class="map-layout-wrapper">
+                                    <div class="map-container">
+                                        <div id="map"></div>
+                                    </div>
+                                </div>
+                                <div class="row mt-4">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">نقطة الانطلاق</label>
+                                        <input type="text" class="form-control" formControlName="startCity" placeholder="اختر من الخريطة أو ابحث هنا">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">الوجهة</label>
+                                        <input type="text" class="form-control" formControlName="destinationCity" placeholder="اختر من الخريطة أو ابحث هنا">
+                                    </div>
+                                </div>
+                              </div>
+
+                                <div *ngIf="currentStep() === 2" class="step-content">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">تاريخ ووقت المغادرة</label>
+                                            <input type="datetime-local" class="form-control" formControlName="departureDateTime" [min]="getMinDateTime()" [class.is-invalid]="tripForm.get('departureDateTime')?.invalid && tripForm.get('departureDateTime')?.touched">
+                                            <div class="invalid-feedback">حقل التاريخ والوقت مطلوب.</div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">عدد المقاعد المتاحة</label>
+                                            <input type="number" class="form-control" formControlName="seatsAvailable" min="1" placeholder="اكتب عدد المقاعد" [class.is-invalid]="tripForm.get('seatsAvailable')?.invalid && tripForm.get('seatsAvailable')?.touched">
+                                            <div class="invalid-feedback">الرجاء إدخال عدد مقاعد صالح.</div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-md-6 mb-4">
+                                            <label class="form-label">سعر المقعد الواحد (بالجنيه)</label>
+                                            <input type="number" class="form-control" formControlName="price" placeholder="مثال: 50" min="1" [class.is-invalid]="tripForm.get('price')?.invalid && tripForm.get('price')?.touched">
+                                            <div class="invalid-feedback">الرجاء إدخال سعر صالح.</div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-4">
+                                            <label class="form-label" for="carId">اختر السيارة</label>
+                                            <select id="carId" class="form-select" formControlName="carId" [class.is-invalid]="tripForm.get('carId')?.invalid && tripForm.get('carId')?.touched">
+                                                <option [ngValue]="null" disabled>-- الرجاء اختيار سيارة --</option>
+                                                <option *ngFor="let car of driverCars()" [value]="car.id">
+                                                    {{ car.model }} - ({{ car.plateNumber }})
+                                                </option>
+                                                <option *ngIf="driverCars().length === 0" disabled>لا يوجد سيارات مسجلة. يرجى إضافة سيارة من ملفك الشخصي.</option>
+                                            </select>
+                                            <div class="invalid-feedback">
+                                                حقل السيارة مطلوب.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- ✅ NEW: Auto-Accept Toggle Switch -->
+                                    <div class="row">
+                                        <div class="col-12 mb-4">
+                                            <div class="toggle-switch-container">
+                                                <div class="toggle-switch-label">
+                                                    <label class="form-label mb-0">القبول التلقائي للحجوزات</label>
+                                                    <small class="form-text text-muted">عند التفعيل، سيتم قبول جميع طلبات الحجز فوراً.</small>
+                                                </div>
+                                                <div class="toggle-switch">
+                                                    <input type="checkbox" id="autoAccept" formControlName="autoAcceptBooking">
+                                                    <label for="autoAccept"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-12 mb-4 mt-3">
+                                            <label class="form-label">ملاحظات إضافية (اختياري)</label>
+                                            <textarea class="form-control" formControlName="notes" rows="3" placeholder="مثل: ممنوع التدخين، التوقف للصلاة متاح..."></textarea>
+                                            <div class="suggestion-notes mt-2">
+                                                <button type="button" class="btn btn-outline-primary btn-sm me-2 mb-2 custom-radius-btn" (click)="addNote('ممنوع التدخين')"><fa-icon [icon]="icons.noSmoke" class="me-1"></fa-icon> ممنوع التدخين</button>
+                                                <button type="button" class="btn btn-outline-primary btn-sm me-2 mb-2 custom-radius-btn" (click)="addNote('التوقف للصلاة متاح')"><fa-icon [icon]="icons.prayer" class="me-1"></fa-icon> التوقف للصلاة متاح</button>
+                                                <button type="button" class="btn btn-outline-primary btn-sm me-2 mb-2 custom-radius-btn" (click)="addNote('حقيبة واحدة فقط')"><fa-icon [icon]="icons.luggage" class="me-1"></fa-icon> حقيبة واحدة فقط</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                
+                                <div *ngIf="currentStep() === 3" class="step-content">
+                                    <div class="review-section">
+                                        <h5 class="mb-4">مراجعة تفاصيل الرحلة:</h5>
+                                        <div class="review-card mb-4">
+                                            <h6 class="review-title"><fa-icon [icon]="icons.route" class="me-2"></fa-icon>مسار الرحلة</h6>
+                                            <div class="route-display">
+                                                <div class="route-point start"><div class="route-icon"><fa-icon [icon]="icons.start"></fa-icon></div><div class="route-details"><h6>نقطة الانطلاق</h6><p>{{ tripForm.value.startCity }}</p></div></div>
+                                                <div class="route-line"></div>
+                                                <div class="route-point end"><div class="route-icon"><fa-icon [icon]="icons.end"></fa-icon></div><div class="route-details"><h6>الوجهة</h6><p>{{ tripForm.value.destinationCity }}</p></div></div>
+                                            </div>
+                                        </div>
+                                        <div class="review-card mb-4">
+                                            <h6 class="review-title"><fa-icon [icon]="icons.info" class="me-2"></fa-icon>تفاصيل الرحلة</h6>
+                                            <div class="row">
+                                                <div class="col-md-6"><p><strong>التاريخ:</strong> {{ formatDateTime(tripForm.value.departureDateTime, 'date') }}</p><p><strong>الوقت:</strong> {{ formatDateTime(tripForm.value.departureDateTime, 'time') }}</p></div>
+                                                <div class="col-md-6"><p><strong>المقاعد:</strong> {{ tripForm.value.seatsAvailable }}</p><p><strong>سعر المقعد:</strong> {{ tripForm.value.price }} جنيه</p></div>
+                                            </div>
+                                            <p class="mt-2"><strong><fa-icon [icon]="icons.car" class="me-2"></fa-icon>السيارة:</strong> 
+                                                <span *ngIf="selectedCar; else noCarSelected">
+                                                    {{ selectedCar.model }} - ({{ selectedCar.plateNumber }})
+                                                </span>
+                                                <ng-template #noCarSelected>
+                                                    <span class="text-danger">لم تختر سيارة</span>
+                                                </ng-template>
+                                            </p>
+                                            <!-- ✅ NEW: Display the auto-accept status in the review -->
+                                            <p class="mt-2"><strong><i class="fas fa-check-double me-2"></i>القبول التلقائي:</strong> 
+                                                <span [ngClass]="tripForm.value.autoAcceptBooking ? 'text-success' : 'text-danger'">
+                                                    {{ tripForm.value.autoAcceptBooking ? 'مُفعّل' : 'غير مُفعّل' }}
+                                                </span>
+                                            </p>
+                                            <div class="total-earnings mt-3"><strong>إجمالي الدخل المتوقع: {{ totalPrice }} جنيه</strong></div>
+                                        </div>
+                                        <div class="review-card" *ngIf="tripForm.value.notes">
+                                            <h6 class="review-title"><fa-icon [icon]="icons.note" class="me-2"></fa-icon>ملاحظات إضافية</h6>
+                                            <p>{{ tripForm.value.notes }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-outline-secondary" [disabled]="currentStep() === 1" (click)="previousStep()"><i class="fas fa-arrow-right me-2"></i>السابق</button>
+                                <div>
+                                    <button type="button" class="btn btn-primary" *ngIf="currentStep() < totalSteps" [disabled]="!isStepValid()" (click)="nextStep()">التالي<i class="fas fa-arrow-left ms-2"></i></button>
+                                    <button type="submit" class="btn btn-success btn-lg" *ngIf="currentStep() === totalSteps" [disabled]="!tripForm.valid || isSubmitting()" (click)="onSubmit()">
+                                        <span *ngIf="isSubmitting()" class="spinner-border spinner-border-sm me-2"></span>
+                                        <fa-icon *ngIf="!isSubmitting()" [icon]="icons.create" class="me-2"></fa-icon>
+                                        {{ isSubmitting() ? 'جاري الإنشاء...' : 'إنشاء الرحلة' }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
   </div>
-
-  <!-- Main Content -->
-  <div class="main-content">
-      <div class="container">
-          <div class="row justify-content-center">
-              <div class="col-lg-10">
-
-                  <!-- Top Card: Header and Stepper -->
-                  <div class="top-card mb-4">
-                      <div class="hero-content text-center">
-                          <h1 class="hero-title">إنشاء رحلة جديدة</h1>
-                          <p class="hero-subtitle">شارك رحلتك مع الآخرين واحصل على دخل إضافي</p>
-                      </div>
-                      <div class="steps-container mt-4">
-                          <div class="steps-wrapper">
-                              <div class="step" [class.active]="currentStep() >= 1" [class.completed]="currentStep() >= 1">
-                                  <div class="step-number-wrapper">
-                                      <div class="step-number">1</div>
-                                  </div>
-                                  <div class="step-title">تفاصيل الرحلة</div>
-                              </div>
-                              <div class="step-line" [class.completed]="currentStep() > 1"></div>
-                              <div class="step" [class.active]="currentStep() >= 2" [class.completed]="currentStep() > 2">
-                                   <div class="step-number-wrapper">
-                                      <div class="step-number">2</div>
-                                  </div>
-                                  <div class="step-title">التوقيت والسعر</div>
-                              </div>
-                              <div class="step-line" [class.completed]="currentStep() > 2"></div>
-                              <div class="step" [class.active]="currentStep() >= 3">
-                                   <div class="step-number-wrapper">
-                                      <div class="step-number">3</div>
-                                  </div>
-                                  <div class="step-title">المراجعة</div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-
-                  <!-- Form Card -->
-                  <div class="form-card" *ngIf="tripForm">
-                      <div class="card-header">
-                          <h1 class="step-title-main mb-0">
-                              <fa-icon [icon]="icons.edit" class="me-2"></fa-icon>
-                              {{ getStepTitle() }}
-                          </h1>
-                          <p class="step-description mb-0">الخطوة {{ currentStep() }} من {{ totalSteps }}</p>
-                      </div>
-
-                      <div class="card-body">
-                          <form [formGroup]="tripForm" (ngSubmit)="onSubmit()">
-                              <!-- ====================================================== -->
-                              <!--      UPDATED STEP 1: Trip Details (with Map)           -->
-                              <!-- ====================================================== -->
-                             <div *ngIf="currentStep() === 1" class="step-content">
-                              <div class="map-controls">
-      <button type="button" (click)="setSelectionMode(true)" [ngClass]="{'active': isSelectingPickup}">
-          <i class="fas fa-map-marker-alt"></i> اختر نقطة الانطلاق
-      </button>
-      <button type="button" (click)="setSelectionMode(false)" [ngClass]="{'active': !isSelectingPickup}">
-          <i class="fas fa-flag"></i> اختر نقطة الوصول
-      </button>
-      <button type="button" (click)="getCurrentLocation()">
-          <i class="fas fa-crosshairs"></i> استخدم موقعي
-      </button>
-      <button type="button" (click)="resetLocations()">
-          <i class="fas fa-undo"></i> إعادة تعيين
-      </button>
-  </div>
-  
-  <!-- This wrapper is key for the layout -->
-  <div class="map-layout-wrapper">
-
-      <!-- The map itself -->
-      <div class="map-container">
-          <div id="map"></div>
-      </div>
-
-      <!-- The controls, positioned relative to the wrapper -->
-      
-  </div>
-
-  <!-- Location Input Fields -->
-  <div class="row mt-4">
-      <div class="col-md-6 mb-3">
-          <label class="form-label">نقطة الانطلاق</label>
-          <input type="text" class="form-control" formControlName="startCity" placeholder="اختر من الخريطة أو ابحث هنا">
-      </div>
-      <div class="col-md-6 mb-3">
-          <label class="form-label">الوجهة</label>
-          <input type="text" class="form-control" formControlName="destinationCity" placeholder="اختر من الخريطة أو ابحث هنا">
-      </div>
-  </div>
-</div>
-                              <!-- ====================================================== -->
-                              <!--             STEP 2: Timing and Price                 -->
-                              <!-- ====================================================== -->
-                              <div *ngIf="currentStep() === 2" class="step-content">
-                                  <div class="row">
-                                      <div class="col-md-6 mb-3">
-                                          <label class="form-label">تاريخ ووقت المغادرة</label>
-                                          <input type="datetime-local" class="form-control" formControlName="departureDateTime" [min]="getMinDateTime()">
-                                      </div>
-                                      <div class="col-md-6 mb-3">
-                                          <label class="form-label">عدد المقاعد المتاحة</label>
-                                          <input type="number" class="form-control" formControlName="availableSeats" min="1" placeholder="اكتب عدد المقاعد">
-                                      </div>
-                                  </div>
-                                  <div class="row mt-3">
-                                      <div class="col-md-6 mb-4">
-                                          <label class="form-label">سعر المقعد الواحد (بالجنيه)</label>
-                                          <input type="number" class="form-control" formControlName="pricePerSeat" placeholder="مثال: 50" min="1">
-                                      </div>
-                                      <div class="col-md-6 mb-4" *ngIf="totalPrice > 0">
-                                          <label class="form-label">ملخص السعر</label>
-                                          <div class="price-summary alert alert-info">
-                                              <p class="mb-0 fw-bold">إجمالي الدخل المتوقع: {{ totalPrice }} جنيه</p>
-                                          </div>
-                                      </div>
-                                  </div>
-                                  <div class="row">
-                                      <div class="col-12 mb-4 mt-3">
-                                          <label class="form-label">ملاحظات إضافية (اختياري)</label>
-                                          <textarea class="form-control" formControlName="notes" rows="3" placeholder="مثل: ممنوع التدخين، التوقف للصلاة متاح..."></textarea>
-                                          <div class="suggestion-notes mt-2">
-                                              <button type="button" class="btn btn-outline-primary btn-sm me-2 mb-2 custom-radius-btn" (click)="addNote('ممنوع التدخين')"><i class="fas fa-smoking-ban me-1"></i> ممنوع التدخين</button>
-                                              <button type="button" class="btn btn-outline-primary btn-sm me-2 mb-2 custom-radius-btn" (click)="addNote('التوقف للصلاة متاح')"><i class="fas fa-mosque me-1"></i> التوقف للصلاة متاح</button>
-                                              <button type="button" class="btn btn-outline-primary btn-sm me-2 mb-2 custom-radius-btn" (click)="addNote('حقيبة واحدة فقط')"><i class="fas fa-suitcase-rolling me-1"></i> حقيبة واحدة فقط</button>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-
-                              <!-- ====================================================== -->
-                              <!--                   STEP 3: Review                       -->
-                              <!-- ====================================================== -->
-                              <div *ngIf="currentStep() === 3" class="step-content">
-                                  <div class="review-section">
-                                      <h5 class="mb-4">مراجعة تفاصيل الرحلة:</h5>
-                                      <div class="review-card mb-4">
-                                          <h6 class="review-title"><i class="fas fa-route me-2"></i>مسار الرحلة</h6>
-                                          <div class="route-display">
-                                              <div class="route-point start"><div class="route-icon"><i class="fas fa-map-marker-alt"></i></div><div class="route-details"><h6>نقطة الانطلاق</h6><p>{{ tripForm.value.startCity }}</p></div></div>
-                                              <div class="route-line"></div>
-                                              <div class="route-point end"><div class="route-icon"><i class="fas fa-flag-checkered"></i></div><div class="route-details"><h6>الوجهة</h6><p>{{ tripForm.value.destinationCity }}</p></div></div>
-                                          </div>
-                                      </div>
-                                      <div class="review-card mb-4">
-                                          <h6 class="review-title"><i class="fas fa-info-circle me-2"></i>تفاصيل الرحلة</h6>
-                                          <div class="row">
-                                              <div class="col-md-6"><p><strong>التاريخ:</strong> {{ formatDateTime(tripForm.value.departureDateTime, 'date') }}</p><p><strong>الوقت:</strong> {{ formatDateTime(tripForm.value.departureDateTime, 'time') }}</p></div>
-                                              <div class="col-md-6"><p><strong>المقاعد:</strong> {{ tripForm.value.availableSeats }}</p><p><strong>سعر المقعد:</strong> {{ tripForm.value.pricePerSeat }} جنيه</p></div>
-                                          </div>
-                                          <div class="total-earnings mt-3"><strong>إجمالي الدخل المتوقع: {{ totalPrice }} جنيه</strong></div>
-                                      </div>
-                                      <div class="review-card" *ngIf="tripForm.value.notes">
-                                          <h6 class="review-title"><i class="fas fa-sticky-note me-2"></i>ملاحظات إضافية</h6>
-                                          <p>{{ tripForm.value.notes }}</p>
-                                      </div>
-                                  </div>
-                              </div>
-                          </form>
-                      </div>
-
-                      <!-- Navigation Buttons -->
-                      <div class="card-footer">
-                          <div class="d-flex justify-content-between">
-                              <button type="button" class="btn btn-outline-secondary" [disabled]="currentStep() === 1" (click)="previousStep()"><i class="fas fa-arrow-right me-2"></i>السابق</button>
-                              <div>
-                                  <button type="button" class="btn btn-primary" *ngIf="currentStep() < totalSteps" [disabled]="!isStepValid()" (click)="nextStep()">التالي<i class="fas fa-arrow-left ms-2"></i></button>
-                                  <button type="submit" class="btn btn-success btn-lg" *ngIf="currentStep() === totalSteps" [disabled]="!tripForm.valid || isSubmitting()" (click)="onSubmit()">
-                                      <span *ngIf="isSubmitting()" class="spinner-border spinner-border-sm me-2"></span>
-                                      <i *ngIf="!isSubmitting()" class="fas fa-plus me-2"></i>
-                                      {{ isSubmitting() ? 'جاري الإنشاء...' : 'إنشاء الرحلة' }}
-                                  </button>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
-</div>

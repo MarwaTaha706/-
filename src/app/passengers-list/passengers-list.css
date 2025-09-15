@@ -1,0 +1,84 @@
+/*
+  هذا الملف يحتوي على الأنماط المخصصة لتصميم "Modern Corporate".
+*/
+
+/* تصميم البطاقة الرئيسية */
+.custom-card {
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+  overflow: hidden; /* مهم لإخفاء زوايا الجدول الحادة */
+}
+
+/* تصميم رأس البطاقة */
+.custom-card-header {
+  background-color: #f8f9fa; /* لون رمادي فاتح جدًا */
+  border-bottom: 1px solid #dee2e6;
+  padding: 1.25rem;
+}
+
+.custom-header-icon {
+  color: #2B438B; /* استخدام اللون الأزرق المميز */
+}
+
+/* تصميم رأس الجدول */
+.table-header-row th {
+  color: #6c757d;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+/* تصميم دائرة الحرف الأول من الاسم (Avatar) */
+.avatar-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #ffffff;
+  background: #2B438B;
+}
+
+/* تصميم مؤشر التحميل المخصص */
+.custom-spinner {
+  color: #2B438B;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+/* تصميم ذيل البطاقة */
+.custom-card-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+}
+
+/* تصميم ترقيم الصفحات */
+.pagination .page-link {
+  border: 1px solid #dee2e6;
+  color: #6c757d;
+  margin: 0 0.25rem;
+  border-radius: 0.5rem !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.pagination .page-item:not(.disabled) .page-link:hover {
+  border-color: #2B438B;
+  color: #2B438B;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #2B438B;
+  border-color: #2B438B;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(43, 67, 139, 0.3);
+}
+
+.pagination .page-item.disabled .page-link {
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+  color: #adb5bd;
+}

@@ -1,230 +1,118 @@
-<!-- <div class="container mx-auto px-4 py-8">
-  <div class="max-w-6xl mx-auto">
-   
-    <div class="flex justify-between items-center mb-8">
-      <div>
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">رحلاتي المقترحة</h1>
-        <p class="text-gray-600">إدارة رحلاتك المقترحة</p>
+<!-- my-suggested-trips.component.html -->
+
+<!-- Main Container with the unified background color -->
+<div class="bg-[#f4f7fc] min-h-screen font-arabic" dir="rtl">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- 1. Page Header (Unified Design) -->
+    <header class="bg-white shadow-lg rounded-2xl p-6 mb-8 mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-4">
+        <div class="bg-[#364E99] text-white p-3 rounded-xl shadow-sm">
+          <i class="bi bi-pin-map-fill text-2xl"></i>
+        </div>
+        <div>
+          <h3 class="text-2xl md:text-3xl font-bold text-gray-800">رحلاتي المقترحة</h3>
+          <p class="text-sm text-gray-500 mt-1">إدارة وتتبع الرحلات التي قمت بإنشائها</p>
+        </div>
       </div>
-      <button 
-        (click)="createNewSuggestion()"
-        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-        </svg>
-        اقتراح رحلة جديدة
+      <button (click)="createNewSuggestion()" class="action-btn bg-[#0BB097] hover:bg-[#0a8a75] w-full sm:w-auto">
+        <i class="bi bi-plus-lg"></i>
+        <span>اقتراح رحلة جديدة</span>
       </button>
-    </div>
+    </header>
 
-    <div *ngIf="isLoading" class="flex justify-center items-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      <span class="ml-3 text-gray-600">جاري تحميل الرحلات...</span>
-    </div>
-
-    <div *ngIf="!isLoading && myTrips.length === 0" class="text-center py-12">
-      <div class="max-w-md mx-auto">
-        <svg class="mx-auto h-24 w-24 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m0 0L9 7"></path>
-        </svg>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">لا توجد رحلات مقترحة</h3>
-        <p class="text-gray-600 mb-6">لم تقم باقتراح أي رحلات بعد. ابدأ باقتراح رحلة جديدة!</p>
-        <button 
-          (click)="createNewSuggestion()"
-          class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200">
-          اقتراح رحلة جديدة
-        </button>
+    <!-- 2. Loading State (Unified Design) -->
+    <div *ngIf="isLoading" class="flex justify-center items-center py-20">
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-[#364E99]"></div>
+        <p class="text-xl font-semibold text-gray-600 mt-6">...جاري تحميل رحلاتك</p>
       </div>
     </div>
 
+    <!-- 3. Empty State (Unified Design) -->
+    <div *ngIf="!isLoading && myTrips.length === 0" class="text-center py-20 bg-white rounded-2xl shadow-sm">
+      <i class="bi bi-car-front text-6xl text-gray-300"></i>
+      <h3 class="mt-4 text-xl font-semibold text-gray-700">لم تقم باقتراح أي رحلات بعد</h3>
+      <p class="text-gray-500 mt-2">ابدأ الآن واقترح رحلتك الأولى للعثور على ركاب.</p>
+    </div>
 
-    <div *ngIf="!isLoading && myTrips.length > 0" class="space-y-6">
-      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <div 
-          *ngFor="let trip of myTrips" 
-          class="bg-white rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow duration-200">
-         
-          <div class="p-6 border-b border-gray-100">
-            <div class="flex justify-between items-start mb-4">
-              <div class="flex-1">
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                  {{ trip.departure.city }} → {{ trip.destination.city }}
-                </h3>
-                <div class="flex items-center text-sm text-gray-500 mb-2">
-                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                  </svg>
-                  {{ trip.preferredDepartureTime | date:'medium' }}
-                </div>
+    <!-- 4. Trips Grid (Unified Design) -->
+    <div *ngIf="!isLoading && myTrips.length > 0" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+
+      <!-- Trip Card (Final Unified Design) -->
+      <div *ngFor="let trip of myTrips" class="card flex flex-col">
+        
+        <!-- Card Header -->
+        <div class="p-4 border-b border-gray-200">
+          <div class="flex justify-between items-start mb-3">
+            <!-- User Info -->
+            <div class="flex items-center gap-3">
+              <img [src]="userProfile?.profileImageUrl || 'assets/images/default-user.png'" 
+                   alt="صورة الملف الشخصي" 
+                   class="w-16 h-16 rounded-full border-4 border-[#0BB097] object-cover">
+              <div>
+                <h3 class="font-bold text-lg text-gray-900">{{ userProfile?.name || 'اسمك' }}</h3>
+                <p class="text-xs text-gray-500">رحلة مقترحة</p>
               </div>
-              <span class="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-                {{ trip.classifications }}
-              </span>
+            </div>
+            <!-- Price -->
+            <div class="text-xl font-extrabold text-[#364E99]">
+              {{ trip.suggestedPrice }}
+              <span class="text-sm font-medium text-gray-600">جنيه</span>
             </div>
           </div>
-
-         
-          <div class="p-6">
-            <div class="space-y-3 mb-4">
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-600">عدد المقاعد:</span>
-                <span class="font-medium">{{ trip.seatCount }}</span>
-              </div>
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-600">السعر المقترح:</span>
-                <span class="font-medium text-green-600">{{ trip.suggestedPrice }} ريال</span>
-              </div>
-            </div>
-
           
-            <div *ngIf="trip.description" class="mb-4">
-              <p class="text-sm text-gray-600">{{ trip.description }}</p>
+          <!-- Journey Visual -->
+          <div class="flex items-center gap-3">
+            <div class="flex flex-col items-center self-stretch">
+              <div class="w-2.5 h-2.5 bg-[#364E99] rounded-full"></div>
+              <div class="w-px flex-grow bg-gray-300 my-1"></div>
+              <div class="w-2.5 h-2.5 bg-[#0BB097] rounded-full"></div>
             </div>
-
-           
-            <div class="space-y-2 mb-4">
-              <div class="flex items-center text-sm">
-                <svg class="w-4 h-4 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-                <span class="text-gray-600">من: {{ trip.departure.address }}, {{ trip.departure.city }}</span>
+           <div class="flex-grow space-y-2">
+              <div>
+                <p class="text-xs text-gray-500">من</p>
+                <span class="font-semibold font-arabic text-gray-800 ">{{ trip.departure.city }}</span>
+                 <span class="text-xs text-gray-600 p-2">{{ getStreetAddress(trip.departure.address, trip.departure.city, trip.departure.country) }}</span>
               </div>
-              <div class="flex items-center text-sm">
-                <svg class="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-                <span class="text-gray-600">إلى: {{ trip.destination.address }}, {{ trip.destination.city }}</span>
+              <div>
+                <p class="text-xs text-gray-500">إلى</p>
+                <span class="font-semibold font-arabic text-gray-800">{{ trip.destination.city }}</span>
+                <span class="text-xs text-gray-600 truncate  p-2">{{ getStreetAddress(trip.destination.address, trip.destination.city, trip.destination.country) }}</span>
               </div>
-            </div>
-
-            <div class="flex gap-2 pt-4 border-t border-gray-100">
-              <button 
-                (click)="editTrip(trip)"
-                class="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                تعديل
-              </button>
-              <button 
-                (click)="deleteTrip(trip)"
-                class="flex-1 bg-red-50 hover:bg-red-100 text-red-700 px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                حذف
-              </button>
             </div>
           </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="p-4 flex-grow space-y-2">
+          <div class="detail-row compact">
+            <span class="label"><i class="fas fa-calendar-alt"></i>التاريخ</span>
+            <span class="value">{{ trip.preferredDepartureTime | date:'mediumDate':'':'ar-EG' }}</span>
+          </div>
+          <div class="detail-row compact">
+            <span class="label"><i class="fas fa-clock"></i>الوقت</span>
+            <span class="value">{{ trip.preferredDepartureTime | date:'shortTime':'':'ar-EG' }}</span>
+          </div>
+          <div class="detail-row compact">
+            <span class="label"><i class="fas fa-users"></i>المقاعد</span>
+            <span class="value">{{ trip.seatCount }}</span>
+          </div>
+        </div>
+
+        <!-- Card Footer: Actions -->
+        <div class="px-4 py-3 bg-gray-50 border-t border-gray-200 flex justify-end items-center gap-2">
+          <button (click)="deleteTrip(trip); $event.stopPropagation()" class="action-btn-sm secondary">
+            <i class="bi bi-trash3"></i>
+            <span>حذف</span>
+          </button>
+          <button (click)="editTrip(trip); $event.stopPropagation()" class="action-btn-sm primary">
+            <i class="bi bi-pencil-square"></i>
+            <span>تعديل</span>
+          </button>
         </div>
       </div>
     </div>
-  </div>
-</div> -->
-<!-- src/app/pages/my-suggested-trips/my-suggested-trips.component.html -->
 
-<!-- src/app/pages/my-suggested-trips/my-suggested-trips.component.html -->
-
-<div class="bg-gray-50 min-h-screen" dir="rtl">
-  <div class="container mx-auto px-4 py-8">
-    <div class="max-w-6xl mx-auto">
-
-      <!-- Page Header -->
-      <div class="flex justify-between items-center mb-8">
-        <div class="flex items-center gap-3">
-          <div class="bg-blue-600 text-white p-3 rounded-lg">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m0 0L9 7"></path></svg>
-          </div>
-          <div>
-            <h1 class="text-2xl font-bold text-gray-900">رحلاتي المقترحة</h1>
-            <p class="text-sm text-gray-500">إدارة وتتبع الرحلات التي قمت بإنشائها</p>
-          </div>
-        </div>
-        <button
-          (click)="createNewSuggestion()"
-          class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-semibold shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-2">
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
-          <span>اقتراح رحلة</span>
-        </button>
-      </div>
-
-      <!-- Loading & Empty States -->
-      <div *ngIf="isLoading" class="flex justify-center items-center py-16">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-      <div *ngIf="!isLoading && myTrips.length === 0" class="text-center py-16 bg-white rounded-lg shadow-sm">
-        <h3 class="text-lg font-medium text-gray-900 mb-2">لا توجد رحلات مقترحة بعد</h3>
-        <p class="text-gray-500">ابدأ باقتراح رحلتك الأولى الآن!</p>
-      </div>
-
-      <!-- Grid for Trip Cards -->
-      <div *ngIf="!isLoading && myTrips.length > 0" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-
-        <!-- Card for each trip -->
-        <div *ngFor="let trip of myTrips" class="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col relative pt-8">
-          
-          <!-- Floating Price Badge -->
-          <div class="absolute top-0 left-4 bg-gradient-to-r from-green-400 to-teal-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg -translate-y-1/2">
-            {{ trip.suggestedPrice }} جنيهاً
-          </div>
-
-          <!-- Card Body -->
-          <div class="px-6 pb-5 flex-grow flex flex-col">
-            <!-- Journey Line Visual -->
-            <div class="mb-5">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-xs text-gray-400 mb-1">من</p>
-                  <h4 class="font-bold text-lg text-gray-800">{{ trip.departure.city }}</h4>
-                </div>
-                <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
-                  <div class="w-4 h-4 rounded-full bg-red-200 flex items-center justify-center">
-                    <div class="w-2 h-2 rounded-full bg-red-500"></div>
-                  </div>
-                </div>
-              </div>
-              <div class="h-6 border-r-2 border-dotted border-gray-200 mr-4 my-1"></div>
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-xs text-gray-400 mb-1">إلى</p>
-                  <h4 class="font-bold text-lg text-gray-800">{{ trip.destination.city }}</h4>
-                </div>
-                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                  <div class="w-4 h-4 rounded-full bg-green-200 flex items-center justify-center">
-                    <div class="w-2 h-2 rounded-full bg-green-500"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Spacer -->
-            <div class="flex-grow"></div>
-
-            <!-- Trip Details -->
-            <div class="border-t border-gray-100 pt-4 space-y-2">
-              <div class="flex items-center justify-between text-sm text-gray-500">
-                <span>{{ trip.preferredDepartureTime | date:'fullDate' }}</span>
-                <i class="bi bi-calendar-event"></i>
-              </div>
-              <div class="flex items-center justify-between text-sm text-gray-500">
-                <span>{{ trip.preferredDepartureTime | date:'shortTime' }}</span>
-                <i class="bi bi-clock"></i>
-              </div>
-              <div class="flex items-center justify-between text-sm text-gray-500">
-                <span>{{ trip.seatCount }} مقاعد متاحة</span>
-                <i class="bi bi-people"></i>
-              </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex gap-2 pt-4 border-t border-gray-100 mt-4">
-              <button (click)="editTrip(trip)" class="flex-1 bg-gray-100 hover:bg-blue-100 text-blue-700 px-4 py-2.5 rounded-lg text-sm font-bold transition-colors duration-200 flex items-center justify-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L16.732 3.732z"></path></svg>
-                <span>تعديل</span>
-              </button>
-              <button (click)="deleteTrip(trip)" class="flex-1 bg-gray-100 hover:bg-red-100 text-red-700 px-4 py-2.5 rounded-lg text-sm font-bold transition-colors duration-200 flex items-center justify-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                <span>حذف</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </div>

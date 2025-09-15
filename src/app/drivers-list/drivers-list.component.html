@@ -1,0 +1,69 @@
+<!-- src/app/drivers-list/drivers-list.component.html -->
+
+<div class="container mx-auto p-4 md:p-0">
+ <div class="d-flex align-items-center gap-3 mb-4">
+  
+  <!-- 
+    - الأيقونة نفسها.
+    - fs-1: كلاس Bootstrap لتحديد حجم الخط (font-size)، وهو الأقرب لـ text-4xl.
+    - custom-icon-color: كلاس مخصص سنضيفه في ملف الـ CSS لتطبيق اللون المطلوب.
+  -->
+  <i class="bi bi-person-vcard-fill fs-1 custom-icon-color"></i>
+  
+  <!-- 
+    - h1: الوسم نفسه.
+    - fw-bold: كلاس Bootstrap لجعل الخط عريضًا (font-weight: bold).
+    - text-dark: كلاس Bootstrap لإعطاء النص لونًا داكنًا ومقروءًا.
+  -->
+  <h1 class="h3 fw-bold text-dark mb-0">إدارة السائقين</h1>
+
+</div>
+
+  <!-- ... (مؤشر التحميل ورسالة عدم وجود بيانات تبقى كما هي) ... -->
+
+  <!-- جدول السائقين -->
+  <div *ngIf="!isLoading && drivers.length > 0" class="bg-white shadow-md rounded-lg overflow-x-auto">
+    <table class="min-w-full leading-normal">
+      <thead>
+        <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+          <th class="py-3 px-6 text-right">الاسم الكامل</th>
+          <th class="py-3 px-6 text-right">البريد الإلكتروني</th>
+          <th class="py-3 px-6 text-center">حالة التوثيق</th>
+          <th class="py-3 px-6 text-center">الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody class="text-gray-700 text-sm">
+        <tr *ngFor="let driver of drivers" class="border-b border-gray-200 hover:bg-gray-100 transition-colors">
+          <td class="py-3 px-6 text-right whitespace-nowrap">
+            <span class="font-medium">{{ driver.name }}</span>
+          </td>
+          <td class="py-3 px-6 text-right">{{ driver.email }}</td>
+          <td class="py-3 px-6 text-center">
+            <span class="py-1 px-3 rounded-full text-xs font-semibold"
+                  [ngClass]="{
+                    'bg-green-200 text-green-800': driver.isVerified,
+                    'bg-yellow-200 text-yellow-800': !driver.isVerified
+                  }">
+              {{ driver.isVerified ? 'موثق' : 'غير موثق' }}
+            </span>
+          </td>
+          <td class="py-3 px-6 text-center">
+            <!-- *** التعديل الرئيسي هنا *** -->
+            <!-- استخدام driver.driverId بدلاً من driver.id -->
+            <a [routerLink]="['/admin/drivers', driver.driverId]"
+               class="bg-indigo-500 hover:bg-indigo-600 text-white py-1 px-4 rounded-full text-xs transition-colors">
+              عرض التفاصيل
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ... (رسالة عدم وجود بيانات) ... -->
+
+  <!-- (اختياري) عرض معلومات الترقيم -->
+  <div *ngIf="paginationInfo && !isLoading" class="mt-4 text-sm text-gray-600">
+    عرض {{ paginationInfo.count }} من أصل {{ paginationInfo.totalCount }} سائق | صفحة {{ paginationInfo.pageNumber }} من {{ paginationInfo.totalPages }}
+  </div>
+</div>

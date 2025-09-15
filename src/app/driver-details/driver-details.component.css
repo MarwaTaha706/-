@@ -1,0 +1,86 @@
+/*
+  هذا الملف يحتوي على الأنماط المخصصة لصفحة "تفاصيل السائق".
+*/
+
+/* تصميم رأس الصفحة */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background-color: white;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+}
+
+/* تصميم دائرة الحرف الأول من الاسم (Avatar) بحجم أكبر */
+.avatar-circle-lg {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ffffff;
+  background: #2B438B;
+}
+
+/* تصميم البطاقات المخصصة */
+.custom-card {
+  border: 1px solid #dee2e6;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+}
+
+.custom-card .card-header {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #0B1225;
+}
+
+/* تصميم عناصر المستندات */
+.document-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #e9ecef;
+}
+.document-item:last-child {
+  border-bottom: none;
+}
+
+/* تصميم شارات الحالة المخصصة */
+.alert-success-light {
+  background-color: #d1e7dd;
+  color: #0f5132;
+  border: 1px solid #badbcc;
+}
+
+.badge.bg-success-light {
+  background-color: #d1e7dd !important;
+  color: #0f5132 !important;
+  padding: 0.4em 0.8em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 20px;
+}
+
+/* تصميم زر الإجراءات */
+.action-btn {
+  border-radius: 20px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+.action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(43, 67, 139, 0.2);
+}
+
+/* تصميم مؤشر التحميل المخصص */
+.custom-spinner {
+  color: #2B438B;
+}

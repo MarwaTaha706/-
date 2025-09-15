@@ -11,7 +11,7 @@
       </div>
       <!-- Register Form (Visible in Register State) -->
       <div class="form-container register-form text-white" *ngIf="isRegisterState">
-        <h4 class="text-lg font-bold mb-4 text-center">سجّل مع مشوار وخلّي الكرسي ليك!</h4>
+        <h2 class="text-2xl font-bold mb-4 text-center">سجّل مع مشوار وخلّي الكرسي ليك!</h2>
         <form class="space-y-4" (ngSubmit)="onRegisterSubmit(registerForm)" #registerForm="ngForm">
           <!-- Name field -->
           <div>
@@ -88,7 +88,7 @@
             </div>
 
             <!-- Password strength indicator -->
-            <!-- <div class="mt-2">
+            <div class="mt-2">
               <div class="flex space-x-1 rtl:space-x-reverse">
                 <div class="h-1 w-1/4 bg-gray-300 rounded"></div>
                 <div class="h-1 w-1/4 bg-yellow-400 rounded"></div>
@@ -96,7 +96,7 @@
                 <div class="h-1 w-1/4 bg-gray-300 rounded"></div>
               </div>
               <p class="text-xs text-gray-500 mt-1">قوة كلمة السر</p>
-            </div> -->
+            </div>
           </div>
           <div class="flex flex-col items-center gap-2">
           <!-- Register button -->

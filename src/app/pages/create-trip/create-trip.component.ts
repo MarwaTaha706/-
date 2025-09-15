@@ -5,19 +5,17 @@ import { Router } from '@angular/router';
 import { finalize, Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import * as L from 'leaflet'; // Import Leaflet
+import * as L from 'leaflet';
+import Swal from 'sweetalert2';
 
-// Import your icons
-import { faRoute, faShieldAlt, faCheckCircle, faExclamationTriangle, faIdCard, faUserCheck, faCameraRetro, faCar, faClipboardCheck, faEdit, faArrowRight, faArrowLeft, faInfoCircle, faTimes, faMapMarkerAlt, faFlag, faCrosshairs, faUndo } from '@fortawesome/free-solid-svg-icons';
+import { faCar, faEdit, faRoute, faMapMarkerAlt, faFlag, faCrosshairs, faUndo, faSmokingBan, faMosque, faSuitcaseRolling, faInfoCircle, faStickyNote, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import { AuthService } from '../../services/auth.service';
 import { TripService } from '../../services/trip.service';
+import { ProfileService } from '../../services/profile.service';
 
-// Define the Location interface
-export interface Location {
-  lat: number;
-  lng: number;
-}
+export interface Location { lat: number; lng: number; }
+export interface Car { id: string; model: string; plateNumber: string; }
 
 @Component({
   selector: 'app-create-trip',
@@ -32,25 +30,21 @@ export class CreateTripComponent implements OnInit, AfterViewInit, OnDestroy {
   private router = inject(Router);
   private authService = inject(AuthService);
   private tripService = inject(TripService);
+  private profileService = inject(ProfileService);
 
-  // --- FontAwesome Icons ---
-  iconRoute = faRoute;
   icons = {
-    edit: faEdit,
-    start: faMapMarkerAlt,
-    end: faFlag,
-    gps: faCrosshairs,
-    reset: faUndo
+    edit: faEdit, start: faMapMarkerAlt, end: faFlag, gps: faCrosshairs, reset: faUndo,
+    car: faCar, route: faRoute, info: faInfoCircle, note: faStickyNote,
+    noSmoke: faSmokingBan, prayer: faMosque, luggage: faSuitcaseRolling, create: faPlus
   };
 
-  // --- Component State ---
   tripForm!: FormGroup;
   isSubmitting = signal(false);
-  isSuccess = signal(false);
+
   currentStep = signal(1);
   totalSteps = 3;
+  driverCars = signal<Car[]>([]);
 
-  // --- Map Properties ---
   private map!: L.Map;
   private pickupMarker?: L.Marker;
   private dropoffMarker?: L.Marker;
@@ -61,9 +55,17 @@ export class CreateTripComponent implements OnInit, AfterViewInit, OnDestroy {
   private toInputSubject = new Subject<string>();
 
   get totalPrice(): number {
-    const seats = this.tripForm?.get('availableSeats')?.value || 0;
-    const price = this.tripForm?.get('pricePerSeat')?.value || 0;
+    const seats = this.tripForm?.get('seatsAvailable')?.value || 0;
+    const price = this.tripForm?.get('price')?.value || 0;
     return seats * price;
+  }
+
+  get selectedCar(): Car | undefined {
+    const selectedId = this.tripForm.get('carId')?.value;
+    if (!selectedId) {
+      return undefined;
+    }
+    return this.driverCars().find(c => c.id === selectedId);
   }
 
   ngOnInit(): void {
@@ -76,11 +78,15 @@ export class CreateTripComponent implements OnInit, AfterViewInit, OnDestroy {
       startCity: ['', Validators.required],
       destinationCity: ['', Validators.required],
       departureDateTime: ['', Validators.required],
-      availableSeats: [1, [Validators.required, Validators.min(1)]],
-      pricePerSeat: ['', [Validators.required, Validators.min(1)]],
-      notes: ['']
+      seatsAvailable: [1, [Validators.required, Validators.min(1)]],
+      price: ['', [Validators.required, Validators.min(1)]],
+      notes: [''],
+      carId: [null, Validators.required],
+      // ✅ NEW: Add the form control for the toggle switch
+      autoAcceptBooking: [true, Validators.required] // Default to true
     });
 
+    this.fetchDriverCars();
     this.initializeLeafletIcons();
 
     this.fromInputSubject.pipe(debounceTime(1000)).subscribe(address => {
@@ -94,28 +100,37 @@ export class CreateTripComponent implements OnInit, AfterViewInit, OnDestroy {
     this.tripForm.get('destinationCity')?.valueChanges.subscribe(value => this.toInputSubject.next(value));
   }
 
-  ngAfterViewInit(): void {
-    this.initMap();
+  fetchDriverCars(): void {
+    this.profileService.getDriverVehicleDetails().subscribe({
+      next: (response) => {
+        if (response && response.data) {
+          const car = response.data;
+          this.driverCars.set([car]);
+          this.tripForm.get('carId')?.setValue(car.id);
+        }
+      },
+      error: (err) => {
+        console.error('Failed to fetch driver cars:', err);
+        this.driverCars.set([]);
+      }
+    });
   }
 
+  ngAfterViewInit(): void { this.initMap(); }
   ngOnDestroy(): void {
-    if (this.map) {
-      this.map.remove();
-    }
+    if (this.map) { this.map.remove(); }
     this.fromInputSubject.unsubscribe();
     this.toInputSubject.unsubscribe();
   }
 
-  // --- Step Navigation ---
   nextStep(): void {
     if (this.isStepValid()) {
       this.currentStep.update(step => Math.min(step + 1, this.totalSteps));
+    } else {
+      this.tripForm.markAllAsTouched();
     }
   }
-
-  previousStep(): void {
-    this.currentStep.update(step => Math.max(step - 1, 1));
-  }
+  previousStep(): void { this.currentStep.update(step => Math.max(step - 1, 1)); }
 
   isStepValid(): boolean {
     const step = this.currentStep();
@@ -123,7 +138,10 @@ export class CreateTripComponent implements OnInit, AfterViewInit, OnDestroy {
       return this.tripForm.get('startCity')!.valid && this.tripForm.get('destinationCity')!.valid;
     }
     if (step === 2) {
-      return this.tripForm.get('departureDateTime')!.valid && this.tripForm.get('availableSeats')!.valid && this.tripForm.get('pricePerSeat')!.valid;
+      return this.tripForm.get('departureDateTime')!.valid &&
+             this.tripForm.get('seatsAvailable')!.valid &&
+             this.tripForm.get('price')!.valid &&
+             this.tripForm.get('carId')!.valid;
     }
     return this.tripForm.valid;
   }
@@ -133,7 +151,6 @@ export class CreateTripComponent implements OnInit, AfterViewInit, OnDestroy {
     return titles[this.currentStep() - 1];
   }
 
-  // --- Map Methods ---
   private initializeLeafletIcons(): void {
     delete (L.Icon.Default.prototype as any)._getIconUrl;
     L.Icon.Default.mergeOptions({
@@ -142,7 +159,6 @@ export class CreateTripComponent implements OnInit, AfterViewInit, OnDestroy {
       shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
     } );
   }
-
   private initMap(): void {
     if (this.map || !document.getElementById('map')) return;
     setTimeout(() => {
@@ -153,7 +169,6 @@ export class CreateTripComponent implements OnInit, AfterViewInit, OnDestroy {
       this.map.on("click", (e: L.LeafletMouseEvent) => this.onMapClick(e.latlng));
     }, 0);
   }
-
   private async onMapClick(latlng: L.LatLng): Promise<void> {
     const location: Location = { lat: latlng.lat, lng: latlng.lng };
     const address = await this.reverseGeocode(location);
@@ -166,21 +181,18 @@ export class CreateTripComponent implements OnInit, AfterViewInit, OnDestroy {
       this.setDropoffMarker(location, address);
     }
   }
-
   private setPickupMarker(location: Location, address: string): void {
     this.tripForm.get('startCity')?.setValue(address, { emitEvent: false });
     if (this.pickupMarker) this.map.removeLayer(this.pickupMarker);
     const greenIcon = new L.Icon({ iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png", shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png", iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] } );
     this.pickupMarker = L.marker([location.lat, location.lng], { icon: greenIcon }).addTo(this.map);
   }
-
   private setDropoffMarker(location: Location, address: string): void {
     this.tripForm.get('destinationCity')?.setValue(address, { emitEvent: false });
     if (this.dropoffMarker) this.map.removeLayer(this.dropoffMarker);
     const redIcon = new L.Icon({ iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png", shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png", iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] } );
     this.dropoffMarker = L.marker([location.lat, location.lng], { icon: redIcon }).addTo(this.map);
   }
-
   async setLocationByAddress(type: 'from' | 'to', address: string): Promise<void> {
     if (!address.trim()) return;
     try {
@@ -199,7 +211,6 @@ export class CreateTripComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     } catch (error) { console.error('Geocoding error:', error); }
   }
-
   private async reverseGeocode(location: Location): Promise<string> {
     try {
       const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.lat}&lon=${location.lng}&accept-language=ar` );
@@ -210,21 +221,17 @@ export class CreateTripComponent implements OnInit, AfterViewInit, OnDestroy {
       return `${location.lat}, ${location.lng}`;
     }
   }
-
   setSelectionMode(isPickup: boolean): void { this.isSelectingPickup = isPickup; }
-
   getCurrentLocation(): void {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(position => {
         const location: Location = { lat: position.coords.latitude, lng: position.coords.longitude };
-        // ✅ FIX: Create a new L.LatLng object before passing it to map methods
         const latLng = new L.LatLng(location.lat, location.lng);
         this.map.setView(latLng, 15);
         this.onMapClick(latLng);
       });
     }
   }
-
   resetLocations(): void {
     this.tripForm.get('startCity')?.reset('');
     this.tripForm.get('destinationCity')?.reset('');
@@ -237,13 +244,11 @@ export class CreateTripComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isSelectingPickup = true;
   }
 
-  // --- Form Actions ---
   addNote(note: string): void {
     const notesControl = this.tripForm.get('notes')!;
     const currentNotes = notesControl.value || '';
     notesControl.setValue(currentNotes ? `${currentNotes}. ${note}` : note);
   }
-
   getMinDateTime(): string {
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -251,32 +256,64 @@ export class CreateTripComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onSubmit(): void {
-    if (!this.tripForm.valid) return;
+    if (!this.tripForm.valid) {
+      console.error('Form is invalid. Please check all fields.');
+      this.tripForm.markAllAsTouched();
+      return;
+    }
 
     this.isSubmitting.set(true);
     const formValue = this.tripForm.value;
+    const departureTimeISO = new Date(formValue.departureDateTime).toISOString();
 
     const payload = {
       departureCity: formValue.startCity,
+      destinationCity: formValue.destinationCity,
+      departureTime: departureTimeISO,
+      seatsAvailable: Number(formValue.seatsAvailable),
+      price: Number(formValue.price),
+      notes: formValue.notes || '',
+      // ✅ NEW: Include the value from the form control
+      autoAcceptBooking: formValue.autoAcceptBooking,
+      carId: formValue.carId,
       departureLatitude: this.pickupLocation?.lat || 0,
       departureLongitude: this.pickupLocation?.lng || 0,
-      destinationCity: formValue.destinationCity,
       destinationLatitude: this.dropoffLocation?.lat || 0,
       destinationLongitude: this.dropoffLocation?.lng || 0,
-      departureTime: new Date(formValue.departureDateTime).toISOString(),
-      seatsAvailable: Number(formValue.availableSeats),
-      price: Number(formValue.pricePerSeat),
-      notes: formValue.notes || ''
     };
 
     this.tripService.createTrip(payload)
       .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
-        next: () => {
-          this.isSuccess.set(true);
-          setTimeout(() => this.router.navigate(['/passenger-dashboard']), 3000);
+        next: (response) => {
+          if (response && response.status === 200 && response.data !== null) {
+            Swal.fire({
+              icon: 'success',
+              title: 'تم إنشاء الرحلة بنجاح!',
+              text: 'سيتم الآن توجيهك إلى لوحة التحكم.',
+              timer: 3000,
+              timerProgressBar: true,
+              showConfirmButton: false
+            }).then(() => {
+              this.router.navigate(['/passenger-dashboard']);
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'حدث خطأ',
+              text: response.message || 'لم نتمكن من إنشاء الرحلة. يرجى المحاولة مرة أخرى.'
+            });
+            console.error('API returned a business error:', response.message);
+          }
         },
-        error: (err: any) => console.error('Failed to create trip:', err)
+        error: (err: any) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'فشل إنشاء الرحلة',
+            text: err.error?.message || 'حدث خطأ غير متوقع. يرجى التحقق من اتصالك بالإنترنت.'
+          });
+          console.error('Failed to create trip:', err);
+        }
       });
   }
 

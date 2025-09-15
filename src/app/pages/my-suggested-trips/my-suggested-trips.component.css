@@ -1,47 +1,106 @@
-/* RTL Support */
-.container {
-  direction: rtl;
+/* Import Font Awesome & Bootstrap Icons if not already global */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css' );
+@import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css' );
+
+/* Base styles for the component host */
+:host {
+  display: block;
+  background-color: #f4f7fc;
+  font-family: 'Cairo', sans-serif;
 }
 
-/* Responsive grid adjustments */
-@media (max-width: 768px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Card hover effects */
-.card-hover {
+/* --- General Card Styling --- */
+.card {
+  background-color: white;
+  border-radius: 1.25rem; /* 20px */
+  padding: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
   transition: all 0.3s ease;
 }
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
 
-.card-hover:hover {
+/* --- Button Styles --- */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.action-btn:hover:not(:disabled) {
   transform: translateY(-2px);
+  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.1);
+}
+/* --- Detail Row Styling --- */
+.detail-row.compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.6rem;
+  border-radius: 0.5rem;
+  background-color: #f8f9fa;
+  transition: background-color 0.2s ease;
+}
+.detail-row.compact:hover {
+  background-color: #f1f3f5;
+}
+.detail-row.compact .label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Added gap for icon */
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.75rem;
+}
+.detail-row.compact .value {
+  font-weight: 700;
+  color: #212529;
+  font-size: 0.8rem;
 }
 
-/* Loading animation */
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+/* --- Small Action Buttons for Card Footer --- */
+.action-btn-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem; /* Smaller padding */
+  font-size: 0.875rem; /* 14px */
+  font-weight: 600;
+  border-radius: 0.6rem; /* ~10px */
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
 }
 
-.animate-spin {
-  animation: spin 1s linear infinite;
+.action-btn-sm.primary {
+  background-color: #364E99;
+  color: white;
+}
+.action-btn-sm.primary:hover {
+  background-color: #1f2c6b;
+  transform: translateY(-1px);
 }
 
-/* Status badge colors */
-.status-active {
-  background-color: #dcfce7;
-  color: #166534;
+.action-btn-sm.secondary {
+  background-color: #f3f4f6;
+  color: #374151;
+  border-color: #d1d5db;
 }
-
-.status-pending {
-  background-color: #fef3c7;
-  color: #92400e;
-}
-
-.status-cancelled {
-  background-color: #fee2e2;
-  color: #991b1b;
+.action-btn-sm.secondary:hover {
+  background-color: #fee2e2; /* Light red on hover */
+  color: #991b1b; /* Dark red text on hover */
+  border-color: #fecaca;
 }

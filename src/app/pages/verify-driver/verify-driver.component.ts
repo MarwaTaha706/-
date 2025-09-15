@@ -1,3 +1,5 @@
+// In src/app/components/verify-driver/verify-driver.component.ts
+
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl } from '@angular/forms';
@@ -56,20 +58,12 @@ export class VerifyDriverComponent implements OnInit {
   toast: { message: string, type: 'success' | 'error' } | null = null;
   showSuccessPopup = false;
 
-  // Holds the safe URLs for image previews
   previews: { [key: string]: SafeUrl[] } = {
-    licenseFile: [],
-    carLicenseFile: [],
-    driverIdFile: [],
-    vehicleImages: []
+    licenseFile: [], carLicenseFile: [], driverIdFile: [], vehicleImages: []
   };
 
-  // Manually tracks the actual File objects for each control
   private selectedFiles: { [key: string]: File[] } = {
-    licenseFile: [],
-    carLicenseFile: [],
-    driverIdFile: [],
-    vehicleImages: []
+    licenseFile: [], carLicenseFile: [], driverIdFile: [], vehicleImages: []
   };
 
   get f() { return this.verificationForm.controls; }
@@ -89,20 +83,16 @@ export class VerifyDriverComponent implements OnInit {
     });
   }
 
+  // --- All other methods (nextStep, previousStep, etc.) remain the same ---
   nextStep(): void {
-    if (this.isStepValid()) {
-      this.currentStep++;
-    } else {
+    if (this.isStepValid()) { this.currentStep++; }
+    else {
       this.markStepAsTouched();
       this.showToast('يرجى إكمال جميع الحقول المطلوبة في هذه الخطوة.', 'error');
     }
   }
 
-  previousStep(): void {
-    if (this.currentStep > 1) {
-      this.currentStep--;
-    }
-  }
+  previousStep(): void { if (this.currentStep > 1) { this.currentStep--; } }
 
   isStepValid(): boolean {
     switch (this.currentStep) {
@@ -120,47 +110,37 @@ export class VerifyDriverComponent implements OnInit {
     return titles[this.currentStep - 1];
   }
 
-  // This method now adds newly selected files to our tracking array
   onFileSelected(event: Event, controlName: string): void {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const newFiles = Array.from(input.files);
-      this.selectedFiles[controlName].push(...newFiles);
+    if (input.files?.length) {
+      this.selectedFiles[controlName].push(...Array.from(input.files));
       this.updateFormControl(controlName);
-      // Clear the input value to allow selecting the same file again after removing it
       input.value = '';
     }
   }
 
-  // This new method removes a specific image by its index
   removeImage(controlName: string, index: number): void {
-    // Remove the file from our manual tracking array
     this.selectedFiles[controlName].splice(index, 1);
-    // Update the form and previews
     this.updateFormControl(controlName);
   }
 
-  // A helper function to keep the form value and previews in sync
   private updateFormControl(controlName: string): void {
     const files = this.selectedFiles[controlName];
-    // Update the form control's value with the current file array
     this.verificationForm.patchValue({ [controlName]: files });
     this.verificationForm.get(controlName)?.markAsTouched();
     this.verificationForm.get(controlName)?.updateValueAndValidity();
-    // Regenerate the previews based on the current file array
     this.previews[controlName] = files.map(file => this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(file)));
   }
 
+  /**
+   * *** FINAL AND CORRECTED onSubmit FUNCTION ***
+   * This function now makes a SINGLE API call to /api/Account/RegisterDriver
+   * with ALL the required data in one FormData object, as the error message dictates.
+   */
   onSubmit(): void {
     if (this.verificationForm.invalid) {
       this.verificationForm.markAllAsTouched();
       this.showToast('الرجاء مراجعة البيانات، هناك حقول غير مكتملة.', 'error');
-      return;
-    }
-
-    const formValue = this.verificationForm.value;
-    if (!formValue.licenseFile?.length || !formValue.carLicenseFile?.length || !formValue.driverIdFile?.length || !formValue.vehicleImages?.length) {
-      this.showToast('جميع مستندات التوثيق مطلوبة (رخصة القيادة، رخصة السيارة، الهوية، صور المركبة).', 'error');
       return;
     }
 
@@ -171,47 +151,60 @@ export class VerifyDriverComponent implements OnInit {
     }
 
     this.isSubmitting = true;
-    // 1. تجهيز بيانات رفع المستندات الشخصية فقط
-    // const docsFormData = new FormData();
-    // docsFormData.append('Comment', formValue.description || '');
-    // (formValue.licenseFile as File[]).forEach(file => docsFormData.append('DriverLicense', file));
-    // (formValue.driverIdFile as File[]).forEach(file => docsFormData.append('Identity', file));
-    // // VehicleRegistration هنا تعني رخصة السيارة فقط
-    // (formValue.carLicenseFile as File[]).forEach(file => docsFormData.append('VehicleRegistration', file));
-    const driverFormData = new FormData();
-    driverFormData.append('DriverDescription', formValue.description || '');
-    driverFormData.append('VehicleDetailsCommand.DriverId', currentUserId);
-    driverFormData.append('VehicleDetailsCommand.Model', formValue.vehicleModel);
-    driverFormData.append('VehicleDetailsCommand.Color', formValue.vehicleColor);
-    driverFormData.append('VehicleDetailsCommand.PlateNumber', formValue.plateNumber);
-    driverFormData.append('VehicleDetailsCommand.SeatsNumber', formValue.vehicleSeats.toString());
-    driverFormData.append('VehicleDetailsCommand.Description', formValue.description || '');
-    // VehicleImageUrls هنا تعني صور السيارة فقط
-    (formValue.vehicleImages as File[]).forEach(file => driverFormData.append('VehicleDetailsCommand.VehicleImageUrls', file));
-    (formValue.licenseFile as File[]).forEach(file => driverFormData.append('addVerificationDocuments.DriverLicense', file));
-    (formValue.driverIdFile as File[]).forEach(file => driverFormData.append('addVerificationDocuments.Identity', file));
-    (formValue.carLicenseFile as File[]).forEach(file => driverFormData.append('addVerificationDocuments.VehicleRegistration', file));
-    // طباعة محتوى docsFormData
-    // for (let pair of docsFormData.entries()) {
-    //   console.log('DOCS:', pair[0], pair[1]);
-    // }
+    const formValue = this.verificationForm.value;
 
-    this.registerDriverService.registerDriver(driverFormData)
+    // --- Create ONE FormData object with ALL information ---
+    const finalFormData = new FormData();
+
+    // Append Root Level Fields
+    finalFormData.append('ApplicationUserId', currentUserId);
+    finalFormData.append('DriverDescription', formValue.description || '');
+
+    // Append VehicleDetailsCommand Fields
+    finalFormData.append('VehicleDetailsCommand.DriverId', currentUserId);
+    finalFormData.append('VehicleDetailsCommand.Model', formValue.vehicleModel);
+    finalFormData.append('VehicleDetailsCommand.Color', formValue.vehicleColor);
+    finalFormData.append('VehicleDetailsCommand.PlateNumber', formValue.plateNumber);
+    finalFormData.append('VehicleDetailsCommand.SeatsNumber', formValue.vehicleSeats.toString());
+    finalFormData.append('VehicleDetailsCommand.Description', formValue.description || '');
+    (formValue.vehicleImages as File[]).forEach(file => {
+      finalFormData.append('VehicleDetailsCommand.VehicleImageUrls', file);
+    });
+
+    // *** THIS IS THE CRITICAL FIX ***
+    // Append AddVerificationDocuments Fields, as required by the error message.
+    finalFormData.append('AddVerificationDocuments.Comment', formValue.description || '');
+    (formValue.licenseFile as File[]).forEach(file => {
+      finalFormData.append('AddVerificationDocuments.DriverLicense', file);
+    });
+    (formValue.driverIdFile as File[]).forEach(file => {
+      finalFormData.append('AddVerificationDocuments.Identity', file);
+    });
+    (formValue.carLicenseFile as File[]).forEach(file => {
+      finalFormData.append('AddVerificationDocuments.VehicleRegistration', file);
+    });
+
+    // --- Make the SINGLE API call ---
+    this.registerDriverService.registerDriver(finalFormData)
       .pipe(finalize(() => this.isSubmitting = false))
       .subscribe({
-        next: (regRes) => {
-          if (regRes && regRes.status === 200) {
-            this.showSuccessPopup = true;
+        next: (response) => {
+          if (response && response.status === 200) {
+            this.showSuccessPopup = true; // Final success!
           } else {
-            this.showToast(regRes?.message || 'فشل إرسال بيانات السائق.', 'error');
+            this.showToast(response?.message || 'فشل إرسال الطلب.', 'error');
           }
         },
         error: (err) => {
-          this.showToast(err.error?.message || 'حدث خطأ أثناء إرسال بيانات السائق.', 'error');
+          const errorMsg = err.error?.errors ? JSON.stringify(err.error.errors) : (err.error?.message || 'حدث خطأ في البيانات المرسلة.');
+          this.showToast(errorMsg, 'error');
         }
       });
   }
 
+  // The registerDriverAndVehicle helper function is no longer needed and can be removed.
+
+  // --- Toast and Popup methods remain the same ---
   showToast(message: string, type: 'success' | 'error'): void {
     this.toast = { message, type };
     setTimeout(() => this.hideToast(), 5000);
@@ -226,13 +219,9 @@ export class VerifyDriverComponent implements OnInit {
 
   private markStepAsTouched(): void {
     const stepControls: { [key: number]: string[] } = {
-      1: ['licenseFile'],
-      2: ['carLicenseFile'],
-      3: ['driverIdFile'],
-      4: ['vehicleImages'],
+      1: ['licenseFile'], 2: ['carLicenseFile'], 3: ['driverIdFile'], 4: ['vehicleImages'],
       5: ['vehicleMake', 'vehicleModel', 'vehicleColor', 'vehicleSeats', 'plateNumber']
     };
-
     const controlsToTouch = stepControls[this.currentStep];
     if (controlsToTouch) {
       controlsToTouch.forEach(field => this.f[field]?.markAsTouched());

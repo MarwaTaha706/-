@@ -1,85 +1,110 @@
-<!-- suggested-trips.component.html -->
 
-<div class="container mx-auto p-4">
-  <h1 class="text-3xl font-bold mb-6">الرحلات المقترحة</h1>
 
-  <!-- حالة التحميل -->
-  <div *ngIf="isLoading" class="text-center">
-    <p>جاري تحميل الرحلات...</p>
-    <!-- يمكنك إضافة أيقونة تحميل هنا -->
-  </div>
+<div class="bg-[#f4f7fc] min-h-screen font-arabic" dir="rtl">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-  <!-- عرض الرحلات -->
-  <div *ngIf="!isLoading && suggestedTrips.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    
-    <!-- استخدام *ngFor لعرض كل رحلة -->
-    <div *ngFor="let trip of suggestedTrips" class="bg-white rounded-lg shadow-md p-6 border-l-4 border-[#0BB097]">
-      
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold text-gray-800">من: {{ trip.departure.city }}</h2>
-        <span class="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">{{ trip.suggestedPrice }} جنيهاً</span>
+  
+    <header class="bg-white shadow-lg rounded-2xl p-6 mb-8 mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-4">
+        <div class="bg-[#364E99] text-white p-3 rounded-xl shadow-sm">
+          <i class="bi bi-compass-fill text-2xl"></i>
+        </div>
+        <div>
+          <h3 class="text-2xl md:text-3xl font-bold text-gray-800">الرحلات المقترحة لك</h3>
+          <p class="text-sm text-gray-500 mt-1">ابحث عن الركاب الذين يبحثون عن رحلات تتوافق مع مسارك</p>
+        </div>
       </div>
-      
-      <p class="text-gray-600 mb-2">إلى: {{ trip.destination.city }}</p>
-      <p class="text-gray-500 text-sm mb-4">بواسطة: {{ trip.userName }}</p>
-      
-      <div class="border-t border-gray-200 pt-4">
-        <p class="text-sm text-gray-700">
-          <i class="bi bi-calendar-event"></i>
-          وقت المغادرة: {{ trip.preferredDepartureTime | date:'short' }}
-        </p>
-        <p class="text-sm text-gray-700">
-          <i class="bi bi-people-fill"></i>
-المقاعد المتاحة: {{ trip.seatCount }}
-        </p>
+    </header>
+     
+    <div *ngIf="isLoading" class="flex justify-center items-center py-20">
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-[#364E99]"></div>
+        <p class="text-xl font-semibold text-gray-600 mt-6">...جاري تحميل الرحلات المقترحة</p>
       </div>
-
-      <!-- أزرار الإجراءات (سنفعلها في الخطوات التالية) -->
-      <!-- <div class="mt-6 flex gap-4">
-        <button class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">تفاصيل</button>
-        <button class="bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600">تعديل</button>
-        <button class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">حذف</button>
-      </div> -->
-      <div class="border-t border-gray-200 mt-6 pt-4">
-  <p class="text-sm font-semibold text-center text-gray-700 mb-3">تواصل مع الراكب عبر</p>
-  <div class="flex justify-center items-center gap-4">
-    
-    <!-- رابط واتساب -->
-    <!-- تحتاج إلى إضافة رقم هاتف الراكب هنا من بيانات الـ API -->
-    <a [href]="'https://wa.me/' + trip.passengerPhoneNumber" target="_blank" class="flex flex-col items-center gap-2 text-gray-600 hover:text-green-500 transition-all duration-200 group">
-      <div class="flex items-center justify-center w-14 h-14 bg-gray-100 rounded-full group-hover:bg-green-100">
-        <i class="bi bi-whatsapp text-2xl text-green-500"></i>
-      </div>
-      <span class="text-xs font-bold">واتساب</span>
-    </a>
-    
-    <!-- رابط البريد الإلكتروني -->
-    <!-- تحتاج إلى إضافة بريد الراكب هنا من بيانات الـ API -->
-    <a [href]="'mailto:' + trip.passengerEmail" class="flex flex-col items-center gap-2 text-gray-600 hover:text-blue-500 transition-all duration-200 group">
-      <div class="flex items-center justify-center w-14 h-14 bg-gray-100 rounded-full group-hover:bg-blue-100">
-        <i class="bi bi-envelope-fill text-2xl text-blue-500"></i>
-      </div>
-      <span class="text-xs font-bold">البريد</span>
-    </a>
-    
-    <!-- رابط الاتصال الهاتفي -->
-    <!-- استخدم نفس رقم الهاتف الخاص بالواتساب -->
-    <a [href]="'tel:' + trip.passengerPhoneNumber" class="flex flex-col items-center gap-2 text-gray-600 hover:text-gray-800 transition-all duration-200 group">
-      <div class="flex items-center justify-center w-14 h-14 bg-gray-100 rounded-full group-hover:bg-gray-200">
-        <i class="bi bi-telephone-fill text-2xl text-gray-700"></i>
-      </div>
-      <span class="text-xs font-bold">اتصال</span>
-    </a>
-    
-  </div>
-</div>
-
     </div>
-  </div>
 
-  <!-- حالة عدم وجود رحلات -->
-  <div *ngIf="!isLoading && suggestedTrips.length === 0" class="text-center text-gray-500 mt-10">
-    <p>لا توجد رحلات مقترحة حاليًا.</p>
-  </div>
+  
+    <div *ngIf="!isLoading && suggestedTrips.length === 0" class="text-center py-20 bg-white rounded-2xl shadow-sm">
+      <i class="bi bi-emoji-frown text-6xl text-gray-300"></i>
+      <h3 class="mt-4 text-xl font-semibold text-gray-700">لا توجد رحلات مقترحة حالياً</h3>
+      <p class="text-gray-500 mt-2">سنقوم بإعلامك عند توفر رحلات جديدة تتناسب معك.</p>
+    </div>
 
+    <div *ngIf="!isLoading && suggestedTrips.length > 0" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+
+   
+      <div *ngFor="let trip of suggestedTrips" 
+           (click)="viewTripDetails(trip)"
+           class="card compact-card cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+        
+      
+        <div class="p-4 border-b border-gray-200">
+          <div class="flex justify-between items-start mb-3">
+            
+            <div class="flex items-center gap-3">
+             
+              <img [src]="urlTransformer.toAbsoluteUrl(trip.passengerImageUrl)" 
+                   alt="صورة الراكب" 
+                   class="w-12 h-12 rounded-full border-2 border-[#0BB097] object-cover">
+              <div>
+                
+                <h3 class="font-bold text-base text-gray-900">{{ trip.userName }}</h3>
+                <p class="text-xs text-gray-500">{{ trip.classifications || 'راكب يبحث عن رحلة' }}</p>
+              </div>
+            </div>
+          
+            <div class="text-lg font-extrabold text-[#364E99]">
+              {{ trip.suggestedPrice }}
+              <span class="text-xs font-medium text-gray-600">جنيه</span>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-3">
+            <div class="flex flex-col items-center self-stretch">
+              <div class="w-2.5 h-2.5 bg-[#364E99] rounded-full"></div>
+              <div class="w-px flex-grow bg-gray-300 my-1"></div>
+              <div class="w-2.5 h-2.5 bg-[#0BB097] rounded-full"></div>
+            </div>
+            <div class="flex-grow space-y-2">
+              <div>
+                <p class="text-xs text-gray-500">من</p>
+                <span class="font-semibold font-arabic text-gray-800 ">{{ trip.departure.city }}</span>
+                 <span class="text-xs text-gray-600 p-2">{{ getStreetAddress(trip.departure.address, trip.departure.city, trip.departure.country) }}</span>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500">إلى</p>
+                <span class="font-semibold font-arabic text-gray-800">{{ trip.destination.city }}</span>
+                <span class="text-xs text-gray-600 truncate  p-2">{{ getStreetAddress(trip.destination.address, trip.destination.city, trip.destination.country) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="p-4 flex-grow space-y-2">
+          <div class="detail-row compact">
+            <span class="label gap-2"><i class="fas fa-calendar-alt mr-2"></i>التاريخ</span>
+            <span class="value">{{ trip.preferredDepartureTime | date:'mediumDate':'':'ar-EG' }}</span>
+          </div>
+          <div class="detail-row compact">
+            <span class="label gap-2"><i class="fas fa-clock mr-2"></i>الوقت</span>
+            <span class="value">{{ trip.preferredDepartureTime | date:'shortTime':'':'ar-EG' }}</span>
+          </div>
+          <div class="detail-row compact">
+            <span class="label gap-2"><i class="fas fa-users mr-2"></i>المقاعد</span>
+            <span class="value">{{ trip.seatCount }}</span>
+          </div>
+        </div>
+
+        <div class="px-4 py-3 bg-gray-50 border-t border-gray-200">
+          <button (click)="contactPassenger(trip); $event.stopPropagation()" 
+                  class="action-btn compact-btn bg-[#364E99] hover:bg-[#1f2c6b]">
+            <i class="bi bi-whatsapp"></i>
+            <span>تواصل</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>

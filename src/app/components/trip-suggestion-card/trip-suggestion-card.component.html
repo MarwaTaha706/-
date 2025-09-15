@@ -1,0 +1,42 @@
+<!-- src/app/components/suggested-trips/suggested-trips.component.html -->
+
+<div class="bg-gray-100 min-h-screen" dir="rtl">
+  <div class="container mx-auto px-4 py-8">
+    <div class="max-w-7xl mx-auto">
+
+      <!-- Page Header -->
+      <div class="flex flex-wrap justify-between items-center gap-4 mb-8">
+        <div class="flex items-center gap-4">
+          <div class="bg-green-600 text-white p-3 rounded-xl shadow-sm">
+            <i class="bi bi-compass-fill text-2xl"></i>
+          </div>
+          <div>
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">الرحلات المقترحة لك</h1>
+            <p class="text-sm text-gray-500 mt-1">ابحث عن الركاب الذين يبحثون عن رحلات تتوافق مع مسارك</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="text-center py-20">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+        <p class="mt-4 text-gray-600">...جاري تحميل الرحلات المقترحة</p>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isLoading && suggestedTrips.length === 0" class="text-center py-20 bg-white rounded-2xl shadow-sm">
+        <i class="bi bi-emoji-frown text-6xl text-gray-300"></i>
+        <h3 class="mt-4 text-xl font-semibold text-gray-700">لا توجد رحلات مقترحة حالياً</h3>
+        <p class="text-gray-500 mt-2">سنقوم بإعلامك عند توفر رحلات جديدة تتناسب معك.</p>
+      </div>
+
+      <!-- Grid for Trip Cards -->
+      <div *ngIf="!isLoading && suggestedTrips.length > 0" class="grid gap-8 md:grid-cols-1 lg:grid-cols-2">
+        
+        <!-- ✅ الجزء الأهم: استخدام الكومبوننت الجديد وتمرير بيانات الرحلة له -->
+        <app-trip-suggestion-card *ngFor="let trip of suggestedTrips" [trip]="trip"></app-trip-suggestion-card>
+
+      </div>
+    </div>
+  </div>
+</div>
