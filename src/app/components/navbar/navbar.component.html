@@ -1,103 +1,199 @@
-<nav class="fixed flex items-center justify-between h-17 shadow-md z-9999 w-full bg-white">
-
-  <div class="flex items-center bg_nav h-full w-[47%] px-6">
-    <a href="/" class="journey-logo-final px-6 pl-14">
-
-      <svg width="220" height="65" viewBox="0 0 220 80" xmlns="http://www.w3.org/2000/svg">
+<nav class="fixed flex items-center justify-between h-17 shadow-md z-[99999] w-full bg-white">
+  
+  <!--
+    MOBILE-ONLY VIEW (Hamburger Left, Logo Center)
+    - This part is already correct for your mobile design.
+  -->
+  <div class="lg:hidden flex items-center justify-between w-full h-full bg_nav px-4">
+    <button #mobileMenuToggle (click)="toggleMobileMenu()" class="text-white p-2" [attr.aria-expanded]="isMobileMenuOpen" aria-label="Toggle navigation menu">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="isMobileMenuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'"></path>
+      </svg>
+    </button>
+    <a href="/" class="journey-logo-final">
+      <svg width="180" height="65" viewBox="0 0 220 80" xmlns="http://www.w3.org/2000/svg">
         <text x="50%" y="35" text-anchor="middle" style="font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 36px; fill: white;">مشوار</text>
         <path d="M 25,60 C 50,35 170,35 195,60" stroke="white" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="5, 5" />
-        <g id="source-pin" style="transform-origin: center center;">
-          <circle cx="25" cy="60" r="8" fill="#0BB097" />
-          <circle cx="25" cy="60" r="3" fill="white" />
-        </g>
-        <g id="dest-pin" style="transform-origin: center center;">
-          <path d="M195 52 C 199 52, 203 56, 203 60 C 203 68, 195 75, 195 75 C 195 75, 187 68, 187 60 C 187 56, 191 52, 195 52 Z" fill="#E53E3E" />
-          <circle cx="195" cy="60" r="2" fill="white" />
-        </g>
-        <g id="car-final" transform="translate(0, -5  )">
-          <path d="M-6,0 l3,-6 l6,0 l3,6 z" fill="#0BB097" />
-          <rect x="-6" y="0" width="12" height="5" rx="2" fill="#36e0c8" />
-        </g>
+        <g id="source-pin"><circle cx="25" cy="60" r="8" fill="#0BB097" /><circle cx="25" cy="60" r="3" fill="white" /></g>
+        <g id="dest-pin"><path d="M195 52 C 199 52, 203 56, 203 60 C 203 68, 195 75, 195 75 C 195 75, 187 68, 187 60 C 187 56, 191 52, 195 52 Z" fill="#E53E3E" /><circle cx="195" cy="60" r="2" fill="white" /></g>
+        <g id="car-final" transform="translate(0, -5 )"><path d="M-6,0 l3,-6 l6,0 l3,6 z" fill="#0BB097" /><rect x="-6" y="0" width="12" height="5" rx="2" fill="#36e0c8" /></g>
       </svg>
     </a>
-    <ul class="flex gap-6 font-medium text-white p-0 m-0">
-      <button (click)="navigateTo('/passenger-dashboard')" class="hover:text-gray-100 border-0 font-bold cursor-pointer transition-transform duration-200 ease-in-out hover:scale-105 whitespace-nowrap">البحث عن رحلة</button>
-      <button (click)="goToCreateTrip()" class="hover:text-gray-100 border-0 font-bold cursor-pointer transition-transform duration-150 ease-in-out hover:scale-105 whitespace-nowrap">إنشاء رحلة</button>
-    </ul>
+    <div class="w-6 h-6"></div> <!-- Spacer for centering -->
   </div>
 
-  <ul class="flex items-center font-medium px-6 m-0">
+  <!--
+    DESKTOP-ONLY VIEW (Logo Left, Buttons Right)
+    - `hidden lg:flex` makes it appear only on large screens.
+    - `justify-between` pushes the left and right content apart.
+  -->
+  <div class="hidden lg:flex items-center justify-between w-full h-full">
+    
+    <!-- Desktop Left Side (Blue Background with Logo and Main Links) -->
+    <div class="flex items-center bg_nav h-full w-[47%] px-6">
+      <a href="/" class="journey-logo-final">
+        <svg width="180" height="65" viewBox="0 0 220 80" xmlns="http://www.w3.org/2000/svg">
+          <text x="50%" y="35" text-anchor="middle" style="font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 36px; fill: white;">مشوار</text>
+          <path d="M 25,60 C 50,35 170,35 195,60" stroke="white" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="5, 5" />
+          <g id="source-pin"><circle cx="25" cy="60" r="8" fill="#0BB097" /><circle cx="25" cy="60" r="3" fill="white" /></g>
+          <g id="dest-pin"><path d="M195 52 C 199 52, 203 56, 203 60 C 203 68, 195 75, 195 75 C 195 75, 187 68, 187 60 C 187 56, 191 52, 195 52 Z" fill="#E53E3E" /><circle cx="195" cy="60" r="2" fill="white" /></g>
+          <g id="car-final" transform="translate(0, -5 )"><path d="M-6,0 l3,-6 l6,0 l3,6 z" fill="#0BB097" /><rect x="-6" y="0" width="12" height="5" rx="2" fill="#36e0c8" /></g>
+        </svg>
+      </a>
+      <ul class="flex gap-6 font-medium text-white p-0 m-0 ml-6">
+        <button (click)="navigateTo('/passenger-dashboard')" class="hover:text-gray-100 border-0 font-bold cursor-pointer whitespace-nowrap">البحث عن رحلة</button>
+        <button (click)="goToCreateTrip()" class="hover:text-gray-100 border-0 font-bold cursor-pointer whitespace-nowrap">إنشاء رحلة</button>
+      </ul>
+    </div>
 
- 
-<div class="flex flex-col sm:flex-row items-center gap-4">
+    <!-- Desktop Right Side (White Background with Buttons/Dropdown) -->
+    <ul class="flex items-center font-medium px-6 m-0">
+      <div class="flex flex-row items-center gap-4">
+        <button *ngIf="authService.isVerifiedDriver()" (click)="navigateTo('/suggested-trips')" class="flex items-center gap-2.5 rounded-full py-2 px-6 text-gray-800 font-bold hover:text-[#0BB097] hover:bg-teal-50 whitespace-nowrap">
+          <i class="fa-regular fa-map"></i>
+          <span>الرحلات المقترحة</span>
+        </button>
+        <button *ngIf="authService.isLoggedIn()" (click)="navigateTo('/my-suggested-trips')" class="flex items-center gap-2.5 rounded-full py-2 px-6 text-gray-800 font-bold hover:text-[#0BB097] hover:bg-teal-50 whitespace-nowrap">
+          <i class="fa-solid fa-street-view"></i>
+          <span>رحلاتي المقترحة</span>
+        </button>
+      </div>
+      <button *ngIf="!authService.isLoggedIn()" (click)="navigateTo('/')" class="hover:text-[#0BB097] border-0 font-bold cursor-pointer mx-3">كيف يعمل</button>
+      <button *ngIf="authService.isLoggedIn() && !authService.isVerifiedDriver()" (click)="navigateTo('/verify-driver')" class="flex gap-2 items-center hover:bg-[#0BB097] hover:border-0 hover:text-white text-[#0BB097] border-[#0BB097] font-bold px-3 py-1 rounded border-1 whitespace-nowrap">
+        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.286zm-1.12 0a14.982 14.982 0 01-4.274 3.036" /></svg>
+        <span>توثيق كسائق</span>
+      </button>
+      <button *ngIf="!authService.isLoggedIn( )" type="button" (click)="goToLogin()" class="hover:bg-[#0BB097] hover:border-0 hover:text-white font-bold py-3 px-8 rounded border-1">تسجيل الدخول</button>
+      <ng-container *ngIf="authService.isLoggedIn()">
+        <div class="relative ml-2">
+          <button #dropdownToggleButton (click)="toggleDropdown()" class="flex items-center gap-2 p-1 rounded-full">
+            <img [src]="profileImageUrl" alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-transparent hover:border-primary-color transition-all">
+            <span class="hidden sm:block font-semibold text-gray-800 whitespace-nowrap">{{ user?.name }}</span>
+            <i *ngIf="authService.isVerifiedDriver()" class="bi bi-patch-check-fill text-green-500 text-lg" title="حساب موثق"></i>
+            <i class="bi text-gray-600" [ngClass]="isDropdownOpen ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+          </button>
+          <div #dropdownMenu *ngIf="isDropdownOpen" class="absolute right-0 mt-2 w-60 bg-white rounded-md shadow-lg py-1 z-20 text-right border border-gray-100">
+            <div class="px-4 py-3 border-b border-gray-200"><p class="font-bold text-gray-800 truncate">{{ user?.name }}</p><p class="text-sm text-gray-500 truncate">{{ user?.email }}</p></div>
+            <a (click)="navigateTo('/profile')" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"><i class="bi bi-person-circle text-lg text-gray-700"></i><span>الملف الشخصي</span></a>
+            <a *ngIf="!authService.isVerifiedDriver()" (click)="navigateTo('/verify-driver')" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"><i class="bi bi-shield-check text-lg text-gray-600"></i><span>توثيق الحساب</span></a>
+            <a *ngIf="authService.isAdmin()" (click)="navigateTo('/admin')" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"><i class="bi bi-gear-wide-connected text-lg text-gray-600"></i><span>لوحة التحكم</span></a>
+            <div class="border-t border-gray-200 my-1"></div>
+            <a (click)="logout()" class="flex items-center gap-3 px-4 py-2 text-sm text-red-700 hover:bg-red-50 cursor-pointer"><i class="bi bi-box-arrow-right text-lg text-gray-700"></i><span>تسجيل الخروج</span></a>
+          </div>
+        </div>
+      </ng-container>
+    </ul>
+  </div>
+</nav>
 
-  <button 
-    *ngIf="authService.isVerifiedDriver()" 
-    (click)="navigateTo('/suggested-trips')"
-    class="flex items-center gap-2.5 rounded-full py-2 px-6 text-gray-800 font-bold 
-           hover:text-[#0BB097] hover:bg-teal-50 transition-transform duration-200 ease-in-out hover:scale-105 whitespace-nowrap">
-    <i class="fa-regular fa-map"></i>
-    <span>الرحلات المقترحة</span>
-  </button>
 
-  <button 
-    *ngIf="authService.isLoggedIn()" 
-    (click)="navigateTo('/my-suggested-trips')"
-    class="flex items-center gap-2.5 rounded-full py-2 px-6 text-gray-800 font-bold 
-           hover:text-[#0BB097] hover:bg-teal-50 transition-transform duration-200 ease-in-out hover:scale-105 whitespace-nowrap">
-    <i class="fa-solid fa-street-view"></i>
-    <span>رحلاتي المقترحة</span>
-  </button>
-
+<!-- Mobile menu overlay -->
+<div *ngIf="isMobileMenuOpen" 
+     class="fixed inset-0 bg-black bg-opacity-50 z-9999 lg:hidden"
+     (click)="closeMobileMenu()">
 </div>
 
-    <button *ngIf="!authService.isLoggedIn()" (click)="navigateTo('/')" class="hover:text-[#0BB097] border-0 font-bold cursor-pointer mx-3">كيف يعمل</button>
-    <button *ngIf="authService.isLoggedIn() && !authService.isVerifiedDriver()" (click)="navigateTo('/verify-driver')" class="flex gap-2 items-center hover:bg-[#0BB097] hover:border-0 hover:text-white text-[#0BB097] border-[#0BB097] font-bold px-3 py-1 rounded border-1 whitespace-nowrap">
-      <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.286zm-1.12 0a14.982 14.982 0 01-4.274 3.036" />
-      </svg>
-      <span>توثيق كسائق</span>
-    </button>
-    <button *ngIf="!authService.isLoggedIn( )" type="button" (click)="goToLogin()" class="hover:bg-[#0BB097] hover:border-0 hover:text-white font-bold py-3 px-8 rounded border-1">
-      تسجيل الدخول
-    </button>
-
-    <ng-container *ngIf="authService.isLoggedIn()">
-      <div class="relative mr-2">
-    
-        <button #dropdownToggleButton (click)="toggleDropdown()" class="flex items-center gap-2 p-1 rounded-full transition-transform duration-200 ease-in-out hover:scale-105">
-          <img [src]="profileImageUrl" alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-transparent hover:border-primary-color transition-all">
-          <span class="hidden sm:block font-semibold text-gray-800 whitespace-nowrap">{{ user?.name }}</span>
-          <i *ngIf="authService.isVerifiedDriver()" class="bi bi-patch-check-fill text-green-500 text-lg" title="حساب موثق"></i>
-          
-          <i class="bi text-gray-600" [ngClass]="isDropdownOpen ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+<!-- Mobile menu -->
+<div class="fixed top-17 left-0 right-0 bg-white shadow-lg z-9999 lg:hidden transition-transform duration-300 ease-in-out"
+     [class.translate-y-0]="isMobileMenuOpen"
+     [class.-translate-y-full]="!isMobileMenuOpen">
+  
+  <div class="px-6 py-4 space-y-4">
+    <!-- Mobile main navigation -->
+    <div class="border-b border-gray-200 pb-4">
+      <h3 class="text-lg font-semibold text-gray-800 mb-3">التنقل الرئيسي</h3>
+      <div class="space-y-3">
+        <button (click)="navigateToAndCloseMobile('/passenger-dashboard')" 
+                class="block w-full text-right text-gray-800 font-bold hover:text-[#0BB097] transition-colors duration-200 py-2">
+          البحث عن رحلة
         </button>
+        <button (click)="goToCreateTripAndCloseMobile()" 
+                class="block w-full text-right text-gray-800 font-bold hover:text-[#0BB097] transition-colors duration-200 py-2">
+          إنشاء رحلة
+        </button>
+      </div>
+    </div>
 
-       
-        <div #dropdownMenu *ngIf="isDropdownOpen" class="absolute left-0 mt-2 w-60 bg-white rounded-md shadow-lg py-1 z-20 text-right border border-gray-100">
-          <div class="px-4 py-3 border-b border-gray-200">
+    <!-- Mobile secondary navigation -->
+    <div class="space-y-3">
+      <button *ngIf="authService.isVerifiedDriver()" 
+              (click)="navigateToAndCloseMobile('/suggested-trips')"
+              class="flex items-center gap-2.5 w-full text-right text-gray-800 font-bold hover:text-[#0BB097] transition-colors duration-200 py-2">
+        <i class="fa-regular fa-map"></i>
+        <span>الرحلات المقترحة</span>
+      </button>
+
+      <button *ngIf="authService.isLoggedIn()" 
+              (click)="navigateToAndCloseMobile('/my-suggested-trips')"
+              class="flex items-center gap-2.5 w-full text-right text-gray-800 font-bold hover:text-[#0BB097] transition-colors duration-200 py-2">
+        <i class="fa-solid fa-street-view"></i>
+        <span>رحلاتي المقترحة</span>
+      </button>
+
+      <button *ngIf="!authService.isLoggedIn()" 
+              (click)="navigateToAndCloseMobile('/')" 
+              class="block w-full text-right text-gray-800 font-bold hover:text-[#0BB097] transition-colors duration-200 py-2">
+        كيف يعمل
+      </button>
+
+      <button *ngIf="authService.isLoggedIn() && !authService.isVerifiedDriver()" 
+              (click)="navigateToAndCloseMobile('/verify-driver')" 
+              class="flex gap-2 items-center justify-end w-full hover:bg-[#0BB097] hover:text-white text-[#0BB097] border-[#0BB097] font-bold px-3 py-2 rounded border-1">
+        <span>توثيق كسائق</span>
+        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.286zm-1.12 0a14.982 14.982 0 01-4.274 3.036" />
+        </svg>
+      </button>
+
+      <button *ngIf="!authService.isLoggedIn()" 
+              type="button" 
+              (click)="goToLoginAndCloseMobile()" 
+              class="w-full hover:bg-[#0BB097] hover:border-0 hover:text-white font-bold py-3 px-8 rounded border-1 text-center">
+        تسجيل الدخول
+      </button>
+    </div>
+
+    <!-- Mobile user profile section -->
+    <ng-container *ngIf="authService.isLoggedIn()">
+      <div class="border-t border-gray-200 pt-4">
+        <div class="flex items-center gap-3 mb-4">
+          <img [src]="profileImageUrl" 
+               alt="Profile" 
+               class="w-12 h-12 rounded-full object-cover border-2 border-gray-200">
+          <div class="flex-1 text-right">
             <p class="font-bold text-gray-800 truncate">{{ user?.name }}</p>
             <p class="text-sm text-gray-500 truncate">{{ user?.email }}</p>
+            <i *ngIf="authService.isVerifiedDriver()" 
+               class="bi bi-patch-check-fill text-green-500 text-sm" 
+               title="حساب موثق"></i>
           </div>
-          <a (click)="navigateTo('/profile')" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer transition-colors duration-150">
+        </div>
+        
+        <div class="space-y-2">
+          <a (click)="navigateToAndCloseMobile('/profile')" 
+             class="flex items-center gap-3 px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer transition-colors duration-150 rounded">
             <i class="bi bi-person-circle text-lg text-gray-700"></i>
             <span>الملف الشخصي</span>
           </a>
-          <a *ngIf="!authService.isVerifiedDriver()" (click)="navigateTo('/verify-driver')" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer transition-colors duration-150">
+          <a *ngIf="!authService.isVerifiedDriver()" 
+             (click)="navigateToAndCloseMobile('/verify-driver')" 
+             class="flex items-center gap-3 px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer transition-colors duration-150 rounded">
             <i class="bi bi-shield-check text-lg text-gray-600"></i>
             <span>توثيق الحساب</span>
           </a>
-          <a *ngIf="authService.isAdmin()" (click)="navigateTo('/admin')" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer transition-colors duration-150">
+          <a *ngIf="authService.isAdmin()" 
+             (click)="navigateToAndCloseMobile('/admin')" 
+             class="flex items-center gap-3 px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer transition-colors duration-150 rounded">
             <i class="bi bi-gear-wide-connected text-lg text-gray-600"></i>
             <span>لوحة التحكم</span>
           </a>
-          <div class="border-t border-gray-200 my-1"></div>
-          <a (click)="logout()" class="flex items-center gap-3 px-4 py-2 text-sm text-red-700 hover:bg-red-50 cursor-pointer transition-colors duration-150">
+          <a (click)="logoutAndCloseMobile()" 
+             class="flex items-center gap-3 px-2 py-2 text-sm text-red-700 hover:bg-red-50 cursor-pointer transition-colors duration-150 rounded">
             <i class="bi bi-box-arrow-right text-lg text-gray-700"></i>
             <span>تسجيل الخروج</span>
           </a>
         </div>
       </div>
     </ng-container>
-  </ul>
-</nav>
+  </div>
+</div>

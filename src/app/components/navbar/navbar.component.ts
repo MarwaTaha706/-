@@ -14,13 +14,14 @@ import { ProfileService } from '../../services/profile.service';
 export class NavbarComponent implements OnInit {
 
   isDropdownOpen = false;
+  isMobileMenuOpen = false;
   isDarkMode = false;
   profileImageUrl: string = 'https://i.pravatar.cc/40';
   user: { name: string; email: string; profileImageUrl: string } | null = null;
 
- 
-  @ViewChild('dropdownMenu' ) dropdownMenuRef?: ElementRef;
+  @ViewChild('dropdownMenu') dropdownMenuRef?: ElementRef;
   @ViewChild('dropdownToggleButton') dropdownToggleButtonRef?: ElementRef;
+  @ViewChild('mobileMenuToggle') mobileMenuToggleRef?: ElementRef;
 
   // --- Constructor & Lifecycle Hooks ---
   constructor(
@@ -43,7 +44,7 @@ export class NavbarComponent implements OnInit {
         this.fetchProfileImage();
       } else {
         this.profileImageUrl = 'https://i.pravatar.cc/40'; // Reset on logout
-        this.cdr.markForCheck( );
+        this.cdr.markForCheck();
       }
     });
   }
@@ -51,25 +52,36 @@ export class NavbarComponent implements OnInit {
   // --- Click Outside Detection ---
   @HostListener('document:click', ['$event.target'])
   onClickOutside(target: HTMLElement): void {
-    // Do nothing if the dropdown is already closed
-    if (!this.isDropdownOpen) {
-      return;
+    // Handle dropdown click outside
+    if (this.isDropdownOpen) {
+      const clickedOnToggle = this.dropdownToggleButtonRef?.nativeElement.contains(target);
+      if (clickedOnToggle) {
+        return; // The toggle function will handle its own state
+      }
+
+      const clickedInsideMenu = this.dropdownMenuRef?.nativeElement.contains(target);
+      if (!clickedInsideMenu) {
+        this.closeDropdown(); // Close the dropdown if the click was outside
+      }
     }
 
-    // Check if the click was on the toggle button
-    const clickedOnToggle = this.dropdownToggleButtonRef?.nativeElement.contains(target);
-    if (clickedOnToggle) {
-      return; // The toggle function will handle its own state
-    }
+    // Handle mobile menu click outside
+    if (this.isMobileMenuOpen) {
+      const clickedOnMobileToggle = this.mobileMenuToggleRef?.nativeElement.contains(target);
+      if (clickedOnMobileToggle) {
+        return; // The toggle function will handle its own state
+      }
 
-
-    const clickedInsideMenu = this.dropdownMenuRef?.nativeElement.contains(target);
-    if (!clickedInsideMenu) {
-      this.closeDropdown(); // Close the dropdown if the click was outside
+      // Check if click was inside mobile menu
+      const mobileMenu = document.querySelector('.fixed.top-17');
+      const clickedInsideMobileMenu = mobileMenu?.contains(target);
+      if (!clickedInsideMobileMenu) {
+        this.closeMobileMenu();
+      }
     }
   }
 
-  // --- Dropdown and Navigation Methods ---
+  // --- Dropdown Methods ---
   toggleDropdown(): void {
     this.isDropdownOpen = !this.isDropdownOpen;
   }
@@ -78,9 +90,28 @@ export class NavbarComponent implements OnInit {
     this.isDropdownOpen = false;
   }
 
+  // --- Mobile Menu Methods ---
+  toggleMobileMenu(): void {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    // Close dropdown when opening mobile menu
+    if (this.isMobileMenuOpen) {
+      this.closeDropdown();
+    }
+  }
+
+  closeMobileMenu(): void {
+    this.isMobileMenuOpen = false;
+  }
+
+  // --- Navigation Methods ---
   navigateTo(path: string): void {
     this.router.navigate([path]);
     this.closeDropdown(); // Close dropdown after navigation
+  }
+
+  navigateToAndCloseMobile(path: string): void {
+    this.router.navigate([path]);
+    this.closeMobileMenu(); // Close mobile menu after navigation
   }
 
   logout(): void {
@@ -89,32 +120,19 @@ export class NavbarComponent implements OnInit {
     this.closeDropdown(); // Ensure dropdown is closed
   }
 
-  // --- Feature Methods ---
-  fetchProfileImage(): void {
-    const isDriver = this.authService.isVerifiedDriver();
-    const profileObs = isDriver 
-      ? this.profileService.getDriverProfile() 
-      : this.profileService.getPassengerProfile();
-
-    profileObs.subscribe({
-      next: (res) => {
-        this.profileImageUrl = res.data?.profileImageUrl || res.data?.driverImageUrl || 'https://i.pravatar.cc/40';
-        this.cdr.markForCheck( );
-      },
-      error: () => {
-        this.profileImageUrl = 'https://i.pravatar.cc/40'; // Fallback on error
-        this.cdr.markForCheck( );
-      }
-    });
-  }
-
-  toggleDarkMode(): void {
-    this.isDarkMode = !this.isDarkMode;
-    document.documentElement.classList.toggle('dark', this.isDarkMode);
+  logoutAndCloseMobile(): void {
+    this.authService.logout();
+    this.router.navigate(['/auth']);
+    this.closeMobileMenu(); // Ensure mobile menu is closed
   }
 
   goToLogin(): void {
     this.router.navigate(['/auth']);
+  }
+
+  goToLoginAndCloseMobile(): void {
+    this.router.navigate(['/auth']);
+    this.closeMobileMenu();
   }
 
   goToCreateTrip(): void {
@@ -129,5 +147,45 @@ export class NavbarComponent implements OnInit {
       // Redirect to verification if not a driver
       this.navigateTo('/verify-driver');
     }
+  }
+
+  goToCreateTripAndCloseMobile(): void {
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/auth']);
+      this.closeMobileMenu();
+      return;
+    }
+    
+    if (this.authService.isVerifiedDriver()) {
+      this.router.navigate(['/create-trip']);
+    } else {
+      // Redirect to verification if not a driver
+      this.navigateToAndCloseMobile('/verify-driver');
+    }
+    this.closeMobileMenu();
+  }
+
+  // --- Feature Methods ---
+  fetchProfileImage(): void {
+    const isDriver = this.authService.isVerifiedDriver();
+    const profileObs = isDriver 
+      ? this.profileService.getDriverProfile() 
+      : this.profileService.getPassengerProfile();
+
+    profileObs.subscribe({
+      next: (res) => {
+        this.profileImageUrl = res.data?.profileImageUrl || res.data?.driverImageUrl || 'https://i.pravatar.cc/40';
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.profileImageUrl = 'https://i.pravatar.cc/40'; // Fallback on error
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  toggleDarkMode(): void {
+    this.isDarkMode = !this.isDarkMode;
+    document.documentElement.classList.toggle('dark', this.isDarkMode);
   }
 }

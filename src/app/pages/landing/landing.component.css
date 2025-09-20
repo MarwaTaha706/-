@@ -1,44 +1,45 @@
-.hero-bg {
-    background-image: url('/Rectangle 46.png');
-    background-size: cover;
-  }
-  .bg{
-    background-color: #0BB097;
-  }
+/* =================================================================== */
+/*  THIS IS THE KEY TO REMOVING THE DESKTOP MARGINS (FULL-BLEED)     */
+/* =================================================================== */
+.full-bleed {
+  /* This makes the section span the entire grid, ignoring the parent's padding. */
+  width: 100vw; /* 100% of the viewport width */
+  grid-column: 1 / -1 !important; /* Span all columns */
   
-/* Custom styles for features section (if needed) */
+  /* This calculation centers the content within the full-width section */
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
 
-/* Custom styles for showcase section (laptop and background text) */
+/* =================================================================== */
+/*  UNIVERSAL RULE FOR THE COMPONENT                                 */
+/* =================================================================== */
+:host {
+  /* This makes the component itself a grid container, allowing full-bleed sections. */
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-column: 1 / -1;
+}
+
+/* =================================================================== */
+/*  HERO SECTION STYLES                                              */
+/* =================================================================== */
+.hero-bg {
+  background-image: url('/Rectangle 46.png'); /* Make sure path is correct */
+  background-size: cover;
+  background-position: center;
+}
+
+/* =================================================================== */
+/*  OTHER STYLES FROM YOUR ORIGINAL FILE                             */
+/* =================================================================== */
+.bg {
+  background-color: #0BB097;
+}
 
 .text-shadow-lg {
   text-shadow: 0 4px 32px rgba(0,0,0,0.35), 0 1.5px 0 #183A7C;
-}
-  .image-container {
-  position: relative; /* Establishes a coordinate system for the absolute children */
-  width: 100%;       /* Takes up the full width of its parent */
-  max-width: 600px;  /* Optional: Prevents the layout from becoming too large on wide screens */
-  height: 500px;     /* The height you specified */
-  margin: auto;      /* Centers the container horizontally */
-}
-
-/* Styling for the phone image */
-.phone-image {
-  position: absolute;
-  bottom: 0;
-  left: 40%; /* Position relative to the container */
-  transform: translateX(-50%); /* Center the image on the 'left' point */
-  width: 45%; /* Scales with the container's width */
-  height: auto; /* Maintains aspect ratio */
-  z-index: 10; /* Places it behind the car */
-}
-
-/* Styling for the car image */
-.car-image {
-  position: absolute;
-  bottom: 0;
-  left: 60%; /* Position relative to the container */
-  transform: translateX(-50%); /* Center the image on the 'left' point */
-  width: 60%; /* Make the car appear larger and in front */
-  height: auto; /* Maintains aspect ratio */
-  z-index: 20; /* Places it in front of the phone */
 }
