@@ -1,94 +1,88 @@
 <!-- ======================================================================= -->
-<!-- FINAL, RESPONSIVE AUTHENTICATION COMPONENT                            -->
+<!-- FINAL, POLISHED & RESPONSIVE AUTHENTICATION COMPONENT (HEIGHT ADJUSTED) -->
 <!-- ======================================================================= -->
 
-<!-- 
-  Main background container.
-  - `p-4 sm:p-6`: Adds padding that works well on mobile and larger screens.
--->
-<div class="flex justify-center items-center overflow-hidden gradient-bg min-h-screen w-full p-4 sm:p-6">
+<div class="flex justify-center items-center overflow-y-auto gradient-bg min-h-screen w-full p-4">
   
   <!-- 
     Main content card.
-    - `w-full`: Takes full width on mobile.
-    - `lg:w-[80%] xl:w-[70%]`: Uses percentage widths only on large screens.
-    - `h-auto`: Allows height to adjust to content on mobile.
-    - `lg:h-[90vh]`: Restores the fixed height on large screens.
-    - `flex-col lg:flex-row`: Stacks content vertically on mobile, side-by-side on large screens.
+    KEY CHANGE:
+    - Replaced `lg:min-h-[650px]` with `lg:h-[700px]`.
+    - `h-auto`: On mobile, height fits the content.
+    - `lg:h-[700px]`: On large screens, the card has a FIXED height of 700px. This creates a more stable and consistent desktop design.
   -->
-  <div class="flex flex-col lg:flex-row justify-center items-stretch rounded-3xl shadow-xl w-full lg:w-[80%] xl:w-[70%] bg-white h-auto lg:h-[90vh]"
+  <div class="flex flex-col lg:flex-row items-stretch rounded-2xl shadow-2xl w-full max-w-4xl bg-white h-auto lg:h-[700px] overflow-hidden"
     [class.register-state]="isRegisterState">
 
     <!-- ======================================================================= -->
     <!-- LEFT SIDE - Content (Image or Register Form)                          -->
     <!-- ======================================================================= -->
-    <!--
-      KEY CHANGE:
-      - `w-full lg:w-1/2`: Takes full width on mobile, 50% on large screens.
-      - `order-2 lg:order-1`: On mobile, this section appears SECOND (below the other one).
-    -->
-    <div class="content-left gradient-border w-full lg:w-1/2 order-2 lg:order-1" [class.form-active]="isRegisterState">
+    <div class="content-left gradient-border w-full lg:w-1/2 order-2 lg:order-1 flex flex-col" [class.form-active]="isRegisterState">
       
       <!-- Image (Visible in Login State on DESKTOP ONLY) -->
-      <!-- KEY CHANGE: `hidden lg:flex` hides the image on mobile. -->
-      <div class="illustration-content hidden lg:flex" *ngIf="!isRegisterState">
-        <div class="">
-          <img src="Carpool-pana.png" alt="Carpool Illustration" class="">
-        </div>
+      <div class="illustration-content hidden lg:flex flex-1 items-center justify-center p-8" *ngIf="!isRegisterState">
+        <img src="Carpool-pana.png" alt="Carpool Illustration" class="max-w-full h-auto">
       </div>
 
       <!-- Register Form (Visible in Register State) -->
-      <div class="form-container register-form text-white p-6 sm:p-8" *ngIf="isRegisterState">
-        <h2 class="text-2xl font-bold mb-4 text-center">سجّل مع مشوار وخلّي الكرسي ليك!</h2>
+      <div class="form-container register-form text-white p-6 sm:p-8 flex-1 flex flex-col justify-center" *ngIf="isRegisterState">
+        <h2 class="text-2xl font-bold mb-6 text-center whitespace-nowrap">سجّل مع مشوار وخلّي الكرسي ليك!</h2>
         <form class="space-y-4" (ngSubmit)="onRegisterSubmit(registerForm)" #registerForm="ngForm">
+          
           <!-- Name field -->
           <div>
             <label class="block text-sm font-medium mb-1">الاسم</label>
-            <input type="text" class="w-full p-2 border border-gray-300 rounded-lg text-gray-700" placeholder="ادخل اسمك" [(ngModel)]="registerData.Name" name="registerName" required #registerNameInput="ngModel">
+            <input type="text" class="w-full p-2.5 border border-gray-300 rounded-lg text-gray-700" placeholder="ادخل اسمك" [(ngModel)]="registerData.Name" name="registerName" required #registerNameInput="ngModel">
             <div *ngIf="registerNameInput.invalid && (registerNameInput.dirty || registerNameInput.touched)" class="text-red-400 text-xs mt-1">الاسم مطلوب</div>
           </div>
+
           <!-- Phone and Gender fields row -->
-          <!-- KEY CHANGE: `grid-cols-1 sm:grid-cols-3` makes this stack on very small screens. -->
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="sm:col-span-2">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+            <div class="md:col-span-2">
               <label class="block text-sm font-medium mb-1">رقم الهاتف</label>
-              <input type="tel" class="w-full p-2 border border-gray-300 rounded-lg text-gray-700 text-right" placeholder="ادخل رقم هاتفك" [(ngModel)]="registerData.PhoneNumber" name="registerPhone" required pattern="^01[0-2,5]{1}[0-9]{8}$" #registerPhoneInput="ngModel">
+              <input type="tel" class="w-full p-2.5 border border-gray-300 rounded-lg text-gray-700 text-right" placeholder="ادخل رقم هاتفك" [(ngModel)]="registerData.PhoneNumber" name="registerPhone" required pattern="^01[0-2,5]{1}[0-9]{8}$" #registerPhoneInput="ngModel">
               <div *ngIf="registerPhoneInput.invalid && (registerPhoneInput.dirty || registerPhoneInput.touched)" class="text-red-400 text-xs mt-1">
                 <span *ngIf="registerPhoneInput.errors?.['required']">رقم الهاتف مطلوب</span>
                 <span *ngIf="registerPhoneInput.errors?.['pattern']">رقم الهاتف غير صحيح</span>
               </div>
             </div>
-            <div class="sm:col-span-1">
+            <div class="md:col-span-1">
               <label class="block text-sm font-medium mb-2">النوع</label>
-              <div class="flex gap-6">
-                <label class="inline-flex items-center"><input type="radio" class="form-radio text-teal-500" name="registerGender" [(ngModel)]="registerData.Gender" [value]="0" required #registerGenderInput="ngModel"><span class="ml-2">ذكر</span></label>
-                <label class="inline-flex items-center"><input type="radio" class="form-radio text-teal-500" name="registerGender" [(ngModel)]="registerData.Gender" [value]="1" required><span class="ml-2">أنثى</span></label>
+              <div class="flex flex-nowrap gap-4">
+                <label class="inline-flex items-center cursor-pointer"><input type="radio" class="form-radio text-teal-500" name="registerGender" [(ngModel)]="registerData.Gender" [value]="0" required #registerGenderInput="ngModel"><span class="mr-2 whitespace-nowrap">ذكر</span></label>
+                <label class="inline-flex items-center cursor-pointer"><input type="radio" class="form-radio text-teal-500" name="registerGender" [(ngModel)]="registerData.Gender" [value]="1" required><span class="mr-2 whitespace-nowrap">أنثى</span></label>
               </div>
               <div *ngIf="registerGenderInput.invalid && (registerGenderInput.dirty || registerGenderInput.touched)" class="text-red-400 text-xs mt-1">النوع مطلوب</div>
             </div>
           </div>
-          <!-- Email, Password, etc. (No major changes needed here) -->
+
+          <!-- Email field -->
           <div>
             <label class="block text-sm font-medium mb-1">البريد الالكتروني</label>
-            <input type="email" class="w-full p-2 border border-gray-300 rounded-lg text-gray-700" placeholder="ادخل بريدك الالكتروني" [(ngModel)]="registerData.Email" name="registerEmail" required email #registerEmailInput="ngModel">
+            <input type="email" class="w-full p-2.5 border border-gray-300 rounded-lg text-gray-700" placeholder="ادخل بريدك الالكتروني" [(ngModel)]="registerData.Email" name="registerEmail" required email #registerEmailInput="ngModel">
             <!-- ... validation messages ... -->
           </div>
-          <div>
-            <label class="block text-sm font-medium mb-1">كلمة المرور</label>
-            <input type="password" class="w-full p-2 border border-gray-300 rounded-lg text-gray-700" placeholder="ادخل كلمة المرور" [(ngModel)]="registerData.Password" name="registerPassword" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{6,}$" #registerPasswordInput="ngModel">
-            <!-- ... validation messages ... -->
+
+          <!-- Password & Confirm Password -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-1">كلمة المرور</label>
+              <input type="password" class="w-full p-2.5 border border-gray-300 rounded-lg text-gray-700" placeholder="ادخل كلمة المرور" [(ngModel)]="registerData.Password" name="registerPassword" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{6,}$" #registerPasswordInput="ngModel">
+              <!-- ... validation messages ... -->
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">تأكيد كلمة المرور</label>
+              <input type="password" class="w-full p-2.5 border border-gray-300 rounded-lg text-gray-700" placeholder="اعد كلمة المرور" [(ngModel)]="registerData.ConfirmPassword" name="registerConfirmPassword" required #registerConfirmPasswordInput="ngModel">
+              <!-- ... validation messages ... -->
+            </div>
           </div>
-          <div>
-            <label class="block text-sm font-medium mb-1">تأكيد كلمة المرور</label>
-            <input type="password" class="w-full p-2 border border-gray-300 rounded-lg text-gray-700" placeholder="اعد كلمة المرور" [(ngModel)]="registerData.ConfirmPassword" name="registerConfirmPassword" required #registerConfirmPasswordInput="ngModel">
-            <!-- ... validation messages ... -->
-          </div>
-          <div class="flex flex-col items-center gap-2 pt-4">
-            <button type="submit" class="w-full sm:w-[60%] border border-[#0BB097] hover:text-white hover:bg-[#0BB097] text-[#0BB097] text-xl font-semibold py-2 rounded-xl transition duration-200" [disabled]="registerForm.invalid">انشاء الحساب</button>
+
+          <div class="flex flex-col items-center gap-3 pt-4">
+            <button type="submit" class="w-full sm:w-3/4 border border-[#0BB097] hover:text-white hover:bg-[#0BB097] text-[#0BB097] text-lg font-semibold py-2 rounded-lg transition duration-200" [disabled]="registerForm.invalid">انشاء الحساب</button>
             <div *ngIf="registerError" class="text-red-500 text-center">{{registerError}}</div>
             <div *ngIf="registerSuccess" class="text-green-500 text-center">{{registerSuccess}}</div>
             <div class="text-center">
-              <p class="text-sm">لديك حساب بالفعل؟ <a (click)="toggleState()" class="text-teal-500 hover:text-teal-600 font-medium cursor-pointer">سجل الدخول</a></p>
+              <p class="text-sm text-gray-300">لديك حساب بالفعل؟ <a (click)="toggleState()" class="text-teal-400 hover:text-teal-300 font-medium cursor-pointer">سجل الدخول</a></p>
             </div>
           </div>
         </form>
@@ -98,43 +92,35 @@
     <!-- ======================================================================= -->
     <!-- RIGHT SIDE - Content (Login Form or Image)                          -->
     <!-- ======================================================================= -->
-    <!--
-      KEY CHANGE:
-      - `w-full lg:w-1/2`: Takes full width on mobile, 50% on large screens.
-      - `order-1 lg:order-2`: On mobile, this section appears FIRST (at the top).
-    -->
-    <div class="content-right gradient-border w-full lg:w-1/2 order-1 lg:order-2" [class.form-active]="!isRegisterState">
+    <div class="content-right gradient-border w-full lg:w-1/2 order-1 lg:order-2 flex flex-col" [class.form-active]="!isRegisterState">
       
       <!-- Login Form (Visible in Login State) -->
-      <div class="form-container login-form w-full text-white p-6 sm:p-8" *ngIf="!isRegisterState">
-        <h2 class="text-2xl font-bold mb-8 text-center">أهلاً بعودتك</h2>
-        <form class="space-y-6" (ngSubmit)="onLoginSubmit(loginForm)" #loginForm="ngForm">
+      <div class="form-container login-form w-full text-white p-6 sm:p-12 flex-1 flex flex-col justify-center" *ngIf="!isRegisterState">
+        <h2 class="text-3xl font-bold mb-8 text-center whitespace-nowrap">أهلاً بعودتك</h2>
+        <form class="space-y-18" (ngSubmit)="onLoginSubmit(loginForm)" #loginForm="ngForm">
           <div>
             <label class="block text-sm font-medium mb-1">البريد الالكتروني</label>
-            <input type="email" class="w-full p-2 border border-gray-300 rounded-lg text-gray-700" placeholder="ادخل بريدك الالكتروني" [(ngModel)]="loginData.email" name="loginEmail" required email #loginEmailInput="ngModel">
+            <input type="email" class="w-full p-2.5 border border-gray-300 rounded-lg text-gray-700" placeholder="ادخل بريدك الالكتروني" [(ngModel)]="loginData.email" name="loginEmail" required email #loginEmailInput="ngModel">
             <!-- ... validation messages ... -->
           </div>
           <div>
             <label class="block text-sm font-medium mb-1">كلمة المرور</label>
-            <input type="password" class="w-full p-2 border border-gray-300 rounded-lg text-gray-700" placeholder="ادخل كلمة المرور" [(ngModel)]="loginData.password" name="loginPassword" required minlength="6" #loginPasswordInput="ngModel">
+            <input type="password" class="w-full p-2.5 border border-gray-300 rounded-lg text-gray-700" placeholder="ادخل كلمة المرور" [(ngModel)]="loginData.password" name="loginPassword" required minlength="6" #loginPasswordInput="ngModel">
             <!-- ... validation messages ... -->
           </div>
-          <div class="flex flex-col items-center gap-2 pt-4">
-            <button type="submit" class="w-full sm:w-[60%] border border-[#0BB097] hover:text-white hover:bg-[#0BB097] text-[#0BB097] text-xl font-semibold py-2 rounded-xl transition duration-200" [disabled]="loginForm.invalid">تسجيل الدخول</button>
+          <div class="flex flex-col items-center gap-3 pt-4">
+            <button type="submit" class="w-full sm:w-3/4 border border-[#0BB097] hover:text-white hover:bg-[#0BB097] text-[#0BB097] text-lg font-semibold py-2 rounded-lg transition duration-200" [disabled]="loginForm.invalid">تسجيل الدخول</button>
             <div *ngIf="loginError" class="text-red-500 text-center">{{loginError}}</div>
             <div class="text-center">
-              <p class="text-sm">ليس لديك حساب؟ <a (click)="toggleState()" class="text-teal-500 hover:text-teal-600 font-medium cursor-pointer">انشاء حساب</a></p>
+              <p class="text-sm text-gray-300">ليس لديك حساب؟ <a (click)="toggleState()" class="text-teal-400 hover:text-teal-300 font-medium cursor-pointer">انشاء حساب</a></p>
             </div>
           </div>
         </form>
       </div>
 
       <!-- Image (Visible in Register State on DESKTOP ONLY) -->
-      <!-- KEY CHANGE: `hidden lg:flex` hides the image on mobile. -->
-      <div class="illustration-content hidden lg:flex" *ngIf="isRegisterState">
-        <div class="">
-          <img src="Carpool-pana.png" alt="Carpool Illustration" class="">
-        </div>
+      <div class="illustration-content hidden lg:flex flex-1 items-center justify-center p-8" *ngIf="isRegisterState">
+        <img src="Carpool-pana.png" alt="Carpool Illustration" class="max-w-full h-auto">
       </div>
     </div>
   </div>
