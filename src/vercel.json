@@ -1,7 +1,7 @@
 {
   "rewrites": [
     {
-      "source": "/api/:path*",
+      "source": "http://me4war.runasp.net/api/:path*",
       "destination": "http://me4war.runasp.net/api/:path*"
     }
   ]
