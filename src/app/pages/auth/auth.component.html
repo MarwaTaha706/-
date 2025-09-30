@@ -26,7 +26,7 @@
 
       <!-- Register Form (Visible in Register State) -->
       <div class="form-container register-form text-white p-6 sm:p-8 flex-1 flex flex-col justify-center" *ngIf="isRegisterState">
-        <h2 class="text-2xl font-bold mb-6 text-center whitespace-nowrap">سجّل مع مشوار وخلّي الكرسي ليك!</h2>
+        <h2 class="text-2xl font-bold mb-6 text-center">سجّل مع مشوار وخلّي الكرسي ليك!</h2>
         <form class="space-y-4" (ngSubmit)="onRegisterSubmit(registerForm)" #registerForm="ngForm">
           
           <!-- Name field -->
@@ -95,17 +95,17 @@
     <div class="content-right gradient-border w-full lg:w-1/2 order-1 lg:order-2 flex flex-col" [class.form-active]="!isRegisterState">
       
       <!-- Login Form (Visible in Login State) -->
-      <div class="form-container login-form w-full text-white p-6 sm:p-12 flex-1 flex flex-col justify-center" *ngIf="!isRegisterState">
-        <h2 class="text-3xl font-bold mb-8 text-center whitespace-nowrap">أهلاً بعودتك</h2>
-        <form class="space-y-18" (ngSubmit)="onLoginSubmit(loginForm)" #loginForm="ngForm">
+      <div class="form-container login-form w-full text-white p-6 sm:p-8 flex-1 flex flex-col justify-center" *ngIf="!isRegisterState">
+        <h2 class="text-2xl font-bold mb-6 text-center">أهلاً بعودتك</h2>
+        <form class="space-y-20" (ngSubmit)="onLoginSubmit(loginForm)" #loginForm="ngForm">
           <div>
             <label class="block text-sm font-medium mb-1">البريد الالكتروني</label>
-            <input type="email" class="w-full p-2.5 border border-gray-300 rounded-lg text-gray-700" placeholder="ادخل بريدك الالكتروني" [(ngModel)]="loginData.email" name="loginEmail" required email #loginEmailInput="ngModel">
+            <input type="email" class="w-full p-2 border border-gray-300 rounded-lg text-gray-700" placeholder="ادخل بريدك الالكتروني" [(ngModel)]="loginData.email" name="loginEmail" required email #loginEmailInput="ngModel">
             <!-- ... validation messages ... -->
           </div>
           <div>
             <label class="block text-sm font-medium mb-1">كلمة المرور</label>
-            <input type="password" class="w-full p-2.5 border border-gray-300 rounded-lg text-gray-700" placeholder="ادخل كلمة المرور" [(ngModel)]="loginData.password" name="loginPassword" required minlength="6" #loginPasswordInput="ngModel">
+            <input type="password" class="w-full p-2 border border-gray-300 rounded-lg text-gray-700" placeholder="ادخل كلمة المرور" [(ngModel)]="loginData.password" name="loginPassword" required minlength="6" #loginPasswordInput="ngModel">
             <!-- ... validation messages ... -->
           </div>
           <div class="flex flex-col items-center gap-3 pt-4">
