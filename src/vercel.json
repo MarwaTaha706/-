@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "https://meshwar-steel.vercel.app/",
-      "destination": "http://me4war.runasp.net/api"
+      "source": "/api/:path*",
+      "destination": "http://me4war.runasp.net/api/:path*"
     }
   ]
-}                   
+}
